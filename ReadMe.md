@@ -65,3 +65,70 @@ Performance improvements and scalability enhancements are made.
 User feedback is collected, and new features may be planned.
 📝 Output: Software Updates, Security Patches, Performance Improvements
 
+
+# Monolithic vs Microservices Architecture
+
+## 1. Overview
+- **Monolithic Architecture**: A single unified application where all components are tightly integrated.
+- **Microservices Architecture**: A distributed system where the application is broken down into smaller, independently deployable services.
+
+---
+
+## 2. Key Differences
+
+| Feature             | Monolithic Architecture | Microservices Architecture |
+|---------------------|------------------------|---------------------------|
+| **Structure**      | Single codebase(BE+FE+Auth+Email...etc)| Multiple independent services(Diff FE + Diff BE + Diff etc..)|
+| **Code Repo**      |Single Code Repo | Multiple Codes Repos for Multiple services|
+| **Scalability**    | Scales as a whole  | Individual services can be scaled separately |
+| **Deployment**     | Entire application redeployed on change | Each service can be deployed independently |
+| **Technology Stack** | Usually a single technology stack | Different services can use different technologies |
+| **Development Speed** | Slower as the codebase grows | Faster due to independent services |
+| **Fault Isolation** | A failure can crash the entire system | Failure in one service does not affect others |
+| **Data Storage**   | Single database shared by all components | Each microservice can have its own database |
+| **Maintenance**    | Becomes difficult over time | Easier due to smaller, manageable services |
+| **Communication**  | Internal function calls | API-based communication (REST, GraphQL, gRPC) |
+| **Best for**       | Small to medium applications | Large-scale, complex applications |
+
+---
+
+## 3. Advantages and Disadvantages
+
+### ✅ **Monolithic Architecture Advantages**:
+- Simple to develop and deploy.
+- Easier debugging and testing.
+- Less infrastructure overhead.
+
+### ❌ **Monolithic Architecture Disadvantages**:
+- Harder to scale as the application grows.
+- A single failure can bring down the entire system.
+- Difficult to adopt new technologies.
+
+### ✅ **Microservices Architecture Advantages**:
+- Better scalability and flexibility.
+- Independent deployment of services.
+- Easier fault isolation and resilience.
+
+### ❌ **Microservices Architecture Disadvantages**:
+- Complex service communication and orchestration.
+- Higher infrastructure and operational overhead.
+- Requires skilled teams for efficient management.
+
+---
+
+## 4. When to Use What?
+- **Use Monolithic Architecture** if:
+  - The application is small or medium-sized.
+  - You need quick development and simple deployment.
+  - You don’t have expertise in distributed systems.
+
+- **Use Microservices Architecture** if:
+  - The application is large and complex.
+  - Scalability and flexibility are priorities.
+  - You have a skilled development team to manage distributed services.
+
+---
+
+## 5. Conclusion
+Both architectures have their place. Monolithic is good for simpler applications, while Microservices is better for complex, scalable systems. The choice depends on project requirements, team expertise, and long-term maintainability.
+
