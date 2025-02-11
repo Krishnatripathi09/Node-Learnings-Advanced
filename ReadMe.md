@@ -1,3 +1,4 @@
+
 ## NODE Learnings Season-2
 SoftWare Development Life Cycle(Water-Fall Model)
    ⬇️  Requirements Gathering & Analysis  
@@ -63,3 +64,4 @@ Regular updates, bug fixes, and patches are released.
 Performance improvements and scalability enhancements are made.
 User feedback is collected, and new features may be planned.
 📝 Output: Software Updates, Security Patches, Performance Improvements
+
