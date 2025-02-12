@@ -184,8 +184,66 @@ When we install __express__ or any Package in our project it gets installed with
 
 And Similarly when we install any dependency the first digit in version (4) means major update verison which is not backward compatible and it can break our app if we install the major verison in our app which is running on minor version for eg: we are using version 4.x.x in our app and we install 5.x.x version so it represents some major update in our app and it could break our application
 
-The second digits (21) represents minor updates which can be installed in our app and wil not do any harm The third digits (2) represents patch updates which are also safe to install in our app and will not do any harm.
+The second digits (21) represents minor updates(Changes) which can be installed in our app and wil not do any harm The third digits (2) represents patch updates(just some Bug fix) which are also safe to install in our app and will not do any harm.
 
-__(^)__ symbol means our app can accept minor and patch updates without any issue. __(~)__ symbol means our app avoids version updates that could introduce new features or bugs if it does not have any symbol then it means that project needs exact dependencies to run.
+__(^)__ symbol means our app can accept minor and patch updates without any issues,That means our project will automatically be updated if any of the new version comes in with __4.X.X__ series. __(~)__ symbol means our app avoids Minor or Major updates and only accepts Patch updates with-in same minor Version. If it does not have any symbol then it means that project needs exact version of dependencies to run and it will never Auto-Update that is will not accept any Major or Minor Update.
 
-while pacakage.json is flexible with installing new minor updates or patch versions but pacakage.lock.json will install exact version of the dependency and will not accept any changes in its version minor or major
+- ^ (Caret) symbol: Allows minor and patch updates within the same major version.
+      Example: "express": "^4.17.1" → Accepts 4.18.0, 4.19.0, etc., but not 5.0.0.
+- ~ (Tilde) symbol: Allows only patch updates within the same minor version.
+      Example: "express": "~4.17.1" → Accepts 4.17.2, 4.17.3, etc., but not 4.18.0.
+-   No Symbol (Exact Version): Locks the dependency to an exact version, meaning no automatic updates.
+      Example: "express": "4.17.1" → Only installs 4.17.1, and never updates automatically.
+
+
+while pacakage.json is flexible with installing new minor updates or patch versions but pacakage.lock.json will install exact version of the dependency and will not accept any changes in its version minor or major.
+For eg: Our Package.json might have any version of the dependency (4.21.2) but packaage-lock.json will have exact version of the dependency
+that our project is running on.
+
+## Creating Our Server:
+Now after installing _express_ in our machine we will create our server using express.
+__"const express = require("express")"__
+
+So here we have required the _express_ and it is coming from our _node_modules_ folder in which it is installed.
+And next we will create an instance of our express Js Application by doing.
+
+const app = express()
+
+
+Creating an instance of express means that we are assigning the instance of express in that particular variable and we no longer need to right express everytime instead we can get all the properties or methods from the app.
+This app object inherits all the properties and methods of Express.
+Now, instead of calling express.methodName(), We can simply use app.methodName()
+
+Now we can call __listen__ method on our app instance and our server will listen on that patricular port 
+which we have specified in our listen method.
+```javascript
+app.listen(3000)
+
+Once we make our app listen on port __3000__ using app.listen(3000) we can also pass a callback function iniside it, 
+and the callback function will be only called once our server is listening on that particular port.
+```javascript
+const express = require("expres")
+const app = express()`
+app.listen(3000,()=>{
+  console.log("Server is listening on Port 3000:")
+})
+
+So Here our Server is listening on Port 3000 but it is not handling any incoming Requests.
+So need to tell our server how to handle incoming requests.
+
+app.use((req, res) => {
+  res.send("Hello I am responding 😁");
+});
+
+Using the above request handler we have Responded to all the incoming request on our port 3000.
+But We should not __app.use__ on our request handler as it will match all the incoming requests(Get,Put,Post,Delete)
+for eg: Instead of using app.use we should use app.get or app.post etc. http methods as __app.use__ matches all the 4 http methods 
+coming to it.
+
+app.use() is mainly used for middleware functions, which execute before your route handlers. These middlewares can:
+
+✅ Run on every request (like logging or authentication)
+✅ Modify request/response objects (e.g., parse JSON, add headers)
+✅ Serve static files
+✅ Handle errors or 404 pages
+
