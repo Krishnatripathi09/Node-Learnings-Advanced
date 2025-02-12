@@ -216,24 +216,25 @@ Now, instead of calling express.methodName(), We can simply use app.methodName()
 
 Now we can call __listen__ method on our app instance and our server will listen on that patricular port 
 which we have specified in our listen method.
+
 ```javascript
-app.listen(3000)
+app.listen(3000) ```
 
 Once we make our app listen on port __3000__ using app.listen(3000) we can also pass a callback function iniside it, 
 and the callback function will be only called once our server is listening on that particular port.
 ```javascript
 const express = require("expres")
-const app = express()`
+const app = express()
 app.listen(3000,()=>{
   console.log("Server is listening on Port 3000:")
-})
+})```
 
 So Here our Server is listening on Port 3000 but it is not handling any incoming Requests.
 So need to tell our server how to handle incoming requests.
-
+```javascript
 app.use((req, res) => {
   res.send("Hello I am responding 😁");
-});
+});```
 
 Using the above request handler we have Responded to all the incoming request on our port 3000.
 But We should not __app.use__ on our request handler as it will match all the incoming requests(Get,Put,Post,Delete)
@@ -247,3 +248,13 @@ app.use() is mainly used for middleware functions, which execute before your rou
 ✅ Serve static files
 ✅ Handle errors or 404 pages
 
+we can also pass a route parameter before our req,res parameters so that our server will only respond to the requests coming to that route.
+```javascript
+app.use("/hello",(req, res) => {
+  res.send("Hello I am responding 😁");
+}); ``` 
+
+In Express.js, methods like .use(), .get(), .post(), .put(), .delete(), etc., take two parameters:
+
+1️⃣ Path (string) → The URL endpoint where the request is handled.
+2️⃣ Request Handler (function) → The callback function that processes the request (req, res, next).
