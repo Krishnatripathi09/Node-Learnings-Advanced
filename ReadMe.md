@@ -218,23 +218,26 @@ Now we can call __listen__ method on our app instance and our server will listen
 which we have specified in our listen method.
 
 ```javascript
-app.listen(3000) ```
+app.listen(3000)
+```
 
 Once we make our app listen on port __3000__ using app.listen(3000) we can also pass a callback function iniside it, 
 and the callback function will be only called once our server is listening on that particular port.
 ```javascript
-const express = require("expres")
+const express = require("express")
 const app = express()
 app.listen(3000,()=>{
   console.log("Server is listening on Port 3000:")
-})```
+})
+```
 
 So Here our Server is listening on Port 3000 but it is not handling any incoming Requests.
 So need to tell our server how to handle incoming requests.
 ```javascript
 app.use((req, res) => {
   res.send("Hello I am responding 😁");
-});```
+});
+```
 
 Using the above request handler we have Responded to all the incoming request on our port 3000.
 But We should not __app.use__ on our request handler as it will match all the incoming requests(Get,Put,Post,Delete)
@@ -252,9 +255,34 @@ we can also pass a route parameter before our req,res parameters so that our ser
 ```javascript
 app.use("/hello",(req, res) => {
   res.send("Hello I am responding 😁");
-}); ``` 
+}); 
+``` 
 
 In Express.js, methods like .use(), .get(), .post(), .put(), .delete(), etc., take two parameters:
 
 1️⃣ Path (string) → The URL endpoint where the request is handled.
 2️⃣ Request Handler (function) → The callback function that processes the request (req, res, next).
+
+Similarly we can add any other Route in our Applicatin and it will also respond to the requests on that Route.
+```javascript
+app.use("/test", (req, res) => {
+  res.send("This is The test Route");
+});
+```
+As everytime we make any changes in our file we have to stop our server(ctr+c) and restart it to reflect those changes on our browser.
+To solve this issue we can install nodemon(It is a utility file which monitors our app for any changes and automatically restart it.)
+using _npm install -g nodemon_ and then restart our server using command _nodemon filename.js_ instead of _npm src/app.js_.
+And nodemon will watch our app for any changes and will start it automatically when anything changes.
+
+When we install a Package globally it gets installed at _C:\Users\<YourUsername>\AppData\Roaming\npm\node_modules_
+
+Instead of writing _nodemon src/app.js_ everytime we want to start our server using Nodemon we can specify a script like below in our 
+our package.json  
+```javascript
+"start":"node src/app.js",
+    "dev":"nodemon src/app.js"
+```
+And then when we want to start our server in watch mode for any changes then we can start it using the script __npm run dev__
+and it will actually use the above above command to start our app using _Nodemon_.
+Or We can also Run our app using _npm run Start_ and then it will start our app in normal mode behind the scenes like above in which we have 
+to manually start our after any changes. 
