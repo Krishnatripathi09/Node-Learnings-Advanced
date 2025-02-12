@@ -128,7 +128,64 @@ User feedback is collected, and new features may be planned.
   - You have a skilled development team to manage distributed services.
 
 ---
-
 ## 5. Conclusion
 Both architectures have their place. Monolithic is good for simpler applications, while Microservices is better for complex, scalable systems. The choice depends on project requirements, team expertise, and long-term maintainability.
 
+
+# Different Types of HTTP Methods
+_GET_: To Get the Data from the Resource(DataBase).
+_POST_: To Send the Data to the Resource(DataBase).
+_PUT_: To Update the whole Resource.
+_PATCH_: To Update the Some Parts of the Resource.
+_DELETE_:To Delete the Data at Resource(DataBase).
+
+
+# Initialize Our Project from Scratch:
+To initialize our project that is to give a name for our project and other configurations we run __npm init__ then we enter the name of the project and other configurations as required. 
+So it takes all the provided configurations about project and creates a __package.json__ file which is like a index of our project(which tells more info about the project) and contains all the information from project name to Project Configurations,Packages used in the project etc.
+
+And that's how we initialize a node Project.
+
+
+So Next we created a src folder which is the main folder containing __app.js__ file and we can start writing the code inside it.
+
+We will be Using Express JS for creating our Server in this Project.
+
+# Difference Between Node.js and Express.js
+
+| Feature        | Node.js  | Express.js  |
+|---------------|---------|-------------|
+| **Definition** | A runtime environment that allows JavaScript to run on the server. | A web framework built on top of Node.js to simplify web app and API development. |
+| **Purpose** | Provides the core functionality for server-side JavaScript execution. | Helps in building web applications, APIs, and handling HTTP requests easily. |
+| **Level** | Low-level (provides modules like HTTP, FS, Path, etc.). | High-level (built on top of Node.js for web development). |
+| **Functionality** | Handles file system operations, networking, streams, etc. | Simplifies request handling, routing, and middleware management. |
+| **Routing** | Requires manual routing using core `http` module. | Provides a built-in routing system with easy-to-use methods like `app.get()`, `app.post()`, etc. |
+| **Middleware** | No built-in middleware support; must be implemented manually. | Supports middleware functions to handle requests, responses, and errors easily. |
+| **Flexibility** | Provides more control over server creation and request handling. | Abstracts complexities, making development faster and easier. |
+| **Use Case** | Used for building real-time applications, networking apps, and backend services. | Ideal for building web applications, RESTful APIs, and server-side applications. |
+
+## Summary
+- **Node.js** is the **core runtime** for executing JavaScript on the server.
+- **Express.js** is a **framework** that makes web and API development easier using Node.js.
+
+
+when we ran __npm i express__ it generated 2 files __package-lock.json__ and __node_modules__ along with package.json that was already there.
+So after running the command _npm i express_ all the source code of express that is required to run create and run our app using express JS was 
+downloaded and is put inside the node_modules folder.
+The express also comes with the some other dependencies so those dependencies are also downloaded and put into node_modules folder.So like 
+this all the dependencies that are required in our project are downloaded and put inside node_modules folder.
+
+And then our _package.json_ was also updated and express was added as a dependency inside __package.json__ file.
+A dependency simply means that any package that our project is dependent on and our project cannot run with It.
+
+"express": "^4.21.2"
+
+When we install __express__ or any Package in our project it gets installed with any version like (_4.21.2_) 
+
+And Similarly when we install any dependency the first digit in version (4) means major update verison which is not backward compatible and it can break our app if we install the major verison in our app which is running on minor version for eg: we are using version 4.x.x in our app and we install 5.x.x version so it represents some major update in our app and it could break our application
+
+The second digits (21) represents minor updates which can be installed in our app and wil not do any harm The third digits (2) represents patch updates which are also safe to install in our app and will not do any harm.
+
+__(^)__ symbol means our app can accept minor and patch updates without any issue. __(~)__ symbol means our app avoids version updates that could introduce new features or bugs if it does not have any symbol then it means that project needs exact dependencies to run.
+
+while pacakage.json is flexible with installing new minor updates or patch versions but pacakage.lock.json will install exact version of the dependency and will not accept any changes in its version minor or major
