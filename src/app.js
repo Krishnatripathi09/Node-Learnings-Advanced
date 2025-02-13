@@ -14,3 +14,6 @@ app.post("/user", (req, res) => {
   res.send("I am responding to POST Request Only 😎");
 });
 
+app.delete("/user", (req, res) => {
+  res.send("User Deleted SuccessFully");
+});
