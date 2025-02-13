@@ -21,3 +21,7 @@ app.delete("/user", (req, res) => {
 app.patch("/user", (req, res) => {
   res.send("User Updated Successfully 😑");
 });
+
+app.put("/user", (req, res) => {
+  res.send("User Updated Success FULLY using PUT");
+});

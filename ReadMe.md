@@ -354,3 +354,18 @@ app.use("/user", (req, res) => {
 });
 ```
 That's why order of http requests matter if we use __app.use__ method. 
+
+To Make a Delete api call we have to use __DELETE__  HTTP Method 
+For Eg:
+```javascript
+app.delete("/user", (req, res) => {
+  res.send("User Deleted SuccessFully");
+});
+```
+Similarly to update some parts of user Data we have to make a __PATCH__ API call sever.
+```javascript
+app.patch("/user", (req, res) => {
+  res.send("User Updated Successfully 😑");
+});
+```
+To Updathe the whole Data of the user we have to make a __PUT__ API call to server.
