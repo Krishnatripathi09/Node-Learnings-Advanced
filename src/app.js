@@ -10,7 +10,13 @@ app.get("/user", (req, res) => {
   res.send("I am Responding to only Get Request ");
 });
 
+app.get("/users/:userId", (req, res) => 
+    { console.log(req.params); 
+    res.send({ firstName: "Krishna", lastName: "Tripathi" }); });
+
+
 app.post("/user", (req, res) => {
+  console.log(req.query.name);
   res.send("I am responding to POST Request Only 😎");
 });
 

@@ -368,4 +368,62 @@ app.patch("/user", (req, res) => {
   res.send("User Updated Successfully 😑");
 });
 ```
-To Updathe the whole Data of the user we have to make a __PUT__ API call to server.
+To Update the whole Data of the user we have to make a __PUT__ API call to server.
+
+## Optional Chaining in API Path (Advanced Routing Techniques)
+
+In our routes we can make our path optional by putting a question mark.
+ for eg: If we have a path __/test/abc__ then we can make the path optional by using a question mark after the path like __/test/ab?c__ so here b is optional like if we write the full path (_/test/abc_) on postman so this path will work but if we write it like ( _/test/ac_ ) then it will also point to that path as we have kept b as optional.
+
+ ## (+) Opeartor in Path
+We can also add (+) operator in path so we can add multiple letters in front of which we have added(+) operator in our path unless starting and ending letter is same for eg: __/test/ab+c__ so if we try to acess the path like __/test/abbbbbbbbbbc__ then as well it will work.
+
+o ## (*) Opeartor in Path
+we can also write(*) opeartor in path and it means unless and until starting and ending letters match we can give anything in between the path for eg: we have path __/test/ab*cd/__ then we can write it like __/test/aberhjkshgfdfghjkjhcd/__ and it will hit the path unless the start and 
+ending letters match.
+
+ ## () Opeartor in Path
+Here we can use __()__ to group some characters in our path for eg: if we have path __/test/a(bc)?d__ then even if we do not write the bc in our path it will hit the correct path __/test/ad__ as we made the (bc) optional in our path by using (?) opeartor. We Can also Write REGEX in our Api paths to make more Dynamic.
+Also __/test/a(bc)+d__ we can make our path to accept random values (here bc in this case ) using (+) Operator.
+
+## Regex in API Path
+We can also use regex in our api path to make it more dynamic for eg: if we have 
+a path __/a/__ so here if i go to path /a it will work and if we go to path __/b/__ it will not work.
+We can also use the other REGEX in our path like __/a[0-9]__ then it will work for path __/a1/__ and __/a2/__ but it will not work
+for path __/a/__ and __/b/__ as we have used regex in our path to accept only the numbers in our path after (a).
+
+## Query Params :
+We can read the query params in our api by using __req.query__ on our request for eg: if we have a path _/user_ then we can  console.log(res.query) it and then in postman we can add some query params which will be printed in our Console.
+So When passing query parameters in a URL, We use a question mark (?) to separate the base URL from the query parameters.
+
+for eg: 
+```javascript
+
+app.post("/user", (req, res) => {
+  console.log(req.query);
+  res.send("I am responding to POST Request Only 😎");
+});
+
+```
+so here we are reading the query params on our Request so we have used __req.query__  and in our request url if we pass any 
+__http://localhost:3000/user?userid=101__ query parameter after ? it will be printed to our dev console.
+So here __{userid :'101'}__ will be printed to dev console.
+
+If We have multiple parameters, separate them with (&):
+http://localhost:3000/user?userid=101&name=John
+
+So here { userid: '101', name: 'John' } will be printed to Dev Console
+If we want only values to be printed then we can use __req.query.name__ and it will print only "John" to the console. 
+
+## Routes Dynamic:
+We can also add Dynamic routes by using "/abc/:user" so here (:) giving colon we can add dynamic path and we can read it by using req.params so here userId is the dynamic path which we are accessing. for eg 
+```javascript
+(app.get("/users/:userId", (req, res) => 
+{ console.log(req.params); 
+res.send({ firstName: "Krishna", lastName: "Tripathi" }); });)
+```
+
+So here we have made our Routes Dynamic by  adding "/users/:userId" so Here userId after (:) is dynamic and if we pass any thing after 
+/users/ and it will printed to dev console using (__req.params__).
+
+So like this we can add any Route After Colon (:) and every parameter that we have passd in our url we can receive using req.params.
