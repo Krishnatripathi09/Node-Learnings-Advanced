@@ -210,7 +210,7 @@ And next we will create an instance of our express Js Application by doing.
 const app = express()
 
 
-Creating an instance of express means that we are assigning the instance of express in that particular variable and we no longer need to right express everytime instead we can get all the properties or methods from the app.
+Creating an instance of express means that we are assigning the instance of express in that particular variable and we no longer need to write express everytime instead we can get all the properties or methods from the app.
 This app object inherits all the properties and methods of Express.
 Now, instead of calling express.methodName(), We can simply use app.methodName()
 
@@ -221,7 +221,7 @@ which we have specified in our listen method.
 app.listen(3000)
 ```
 
-Once we make our app listen on port __3000__ using app.listen(3000) we can also pass a callback function iniside it, 
+Once we make our app listen on port __3000__ using app.listen(3000) we can also pass a callback function inside it, 
 and the callback function will be only called once our server is listening on that particular port.
 ```javascript
 const express = require("express")
@@ -283,6 +283,63 @@ our package.json
     "dev":"nodemon src/app.js"
 ```
 And then when we want to start our server in watch mode for any changes then we can start it using the script __npm run dev__
-and it will actually use the above above command to start our app using _Nodemon_.
-Or We can also Run our app using _npm run Start_ and then it will start our app in normal mode behind the scenes like above in which we have 
-to manually start our after any changes. 
+and it will actually use the above command to start our app using _Nodemon_.
+Or We can also Run our app using _npm run Start_ and then it will start our app in normal mode and behind the scenes like above in which we have 
+to manually start our server after any changes. 
+
+## Deleting the Node_Modules and package-lock.json
+We can delete our package-lock.json and node_modules folder and still that can be Recreated by Running _npm install_ in our Project as our 
+package.json contains all the information about our project and all the packages we are using in our project. So running the npm install will recreate the node_modules folder and package-lock.json
+
+## Handling the Routes :
+```javascript
+app.use("/", (req, res) => {
+  res.send("Hello I am Learning 😎");
+});
+```
+When we have route with (/) so anything after that will be matched inside the (/) Route handler so even if we go to any other Route 
+It will always point to (/) Route 
+for Eg: on our server if we have a route (/hello) then as well it will not return the content of (/hello) route it will always return the 
+(/) Route handler content.
+```javascript
+app.use("/hello", (req, res) => {
+  res.send("Hello I am responding 😁");
+});
+```
+In Express.js, routes are matched in the order they are defined. If a more general route ("/") is placed before specific routes ("/hello", "/file"), it will always execute first and prevent the later routes from being reached.
+
+So like this order of routes matter because if we have macthing general route then the first route will always override the next routes
+
+For Eg:
+```javascript
+app.use("/", (req, res) => {
+  res.send("Hello I am Learning 😎");
+});
+
+app.use("/hello", (req, res) => {
+  res.send("Hello I am responding 😁");
+});
+
+app.use("/file", (req, res) => {
+  res.send("This is The test Route");
+});
+```
+Here the Routes (/hello) and (/file) willl be overwritten by (/) route.
+
+So to avoid the Routes being over-ridden we can define specific routes first, then the general "/" route:
+
+## Handling the Get Routes 
+when we use __app.use__ to handle any incoming request then it will match all the http methods(GET,PUT,POST, DELETE,PATCH ) coming to that route
+so to handle only the GET request we can use __app.get__ method and it will match only the GET request coming to that particluar Route.
+For eg:
+app.get("/test"(req,res)=>{
+  res.send("I am responding to GET Request 😎")
+})
+
+So for Above Route Any Request coming with GET method will be matched. It will not match any other __HTTP__ request coming to that Route.
+
+And If we do only  make an hhtp method to handle post request using __app.post__ then it will match and respond to only post Requests.
+for eg:
+app.post("/post",(req,res)=>{
+  res.send("I am responding to POST Request Only 😎")
+})
