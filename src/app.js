@@ -17,3 +17,7 @@ app.post("/user", (req, res) => {
 app.delete("/user", (req, res) => {
   res.send("User Deleted SuccessFully");
 });
+
+app.patch("/user", (req, res) => {
+  res.send("User Updated Successfully 😑");
+});
