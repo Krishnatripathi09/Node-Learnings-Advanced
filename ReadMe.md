@@ -338,8 +338,19 @@ app.get("/test"(req,res)=>{
 
 So for Above Route Any Request coming with GET method will be matched. It will not match any other __HTTP__ request coming to that Route.
 
-And If we do only  make an hhtp method to handle post request using __app.post__ then it will match and respond to only post Requests.
+And If we only make an http method to handle post requests using __app.post__ then it will match and respond to only post Requests.
 for eg:
+
+``` javascript
 app.post("/post",(req,res)=>{
   res.send("I am responding to POST Request Only 😎")
 })
+```
+But If we use a __app.use__ method on __top__ of our other http methods (GET,PUT,POST,DELETE) then it will override all the requests coming
+to these http methods and will respond to those request by itself 
+```javascript
+app.use("/user", (req, res) => {
+  res.send("I will override all the requests below me 😁");
+});
+```
+That's why order of http requests matter if we use __app.use__ method. 

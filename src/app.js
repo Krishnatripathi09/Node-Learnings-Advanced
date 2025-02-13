@@ -10,6 +10,7 @@ app.get("/user", (req, res) => {
   res.send("I am Responding to only Get Request ");
 });
 
-app.post("/post", (req, res) => {
+app.post("/user", (req, res) => {
   res.send("I am responding to POST Request Only 😎");
 });
+
