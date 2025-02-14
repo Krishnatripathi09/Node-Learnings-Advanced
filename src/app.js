@@ -7,13 +7,13 @@ app.listen(3000, () => {
   console.log("Server is successfully Listening on Port 3000 😀");
 });
 
-app.use("/admin", adminAuth);
-
-app.get("/admin/getAllData", (req, res) => {
-  //Auth Logic Here
-  res.send("All User Data");
+app.get("/getUserData", (req, res) => {
+  throw new Error("This is error");
+  res.send("Data is Here");
 });
 
-app.get("/admin/deleteUser", (req, res) => {
-  res.send("User Deleted");
+app.use("/", (err, req, res, next) => {
+  if (err) {
+    res.status(500).send("Something Went Wrong");
+  }
 });

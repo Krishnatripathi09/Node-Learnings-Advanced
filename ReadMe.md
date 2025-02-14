@@ -656,3 +656,23 @@ app.get("/admin/getAllData",adminAuth, (req, res) => {
   res.send("All User Data");
 });
 ```
+
+## ERROR - Handling
+When defining logic for error then we have to pass __err__ as a parameter inside our Route Handler function.
+for eg:
+```javascript
+app.use("/",(err,req,res,next)=>{
+  //Code Logic
+})
+```
+So In Express Js app.use here is a general method which is used here to handle errors. And If we are using __err__ handling then we have to pass
+it as first parameter in our Route Handler.
+So If we ever get an Error We can handle like below:
+```javascript
+app.use("/",(err,req,res,next)=>{
+  if(err){
+    res.status(500).send("Something Went Wrong")
+  }
+})
+``` 
+So here we have gracefully handled all the errors that are coming in our Application 
