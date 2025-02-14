@@ -595,3 +595,64 @@ app.use("/user", ...) runs for all requests starting with __/user__, including /
 
 app.all("/test") will handle GET, POST, PUT, DELETE, etc., but only for __/test__ (not /test/something)
 
+```javascript
+app.use("/admin", (req, res, next) => {
+  console.log("Admin Auth is HIT");
+  const token = "xyz";
+  const isAdminAuthorized = token === "xyz";
+
+  if (isAdminAuthorized) {
+    next();
+  } else {
+    res.status(401).send("Not Authorized:");
+  }
+});
+
+app.get("/admin/getAllData", (req, res) => {
+  //Auth Logic Here
+  res.send("All User Data");
+});
+
+app.get("/admin/deleteUser", (req, res) => {
+  res.send("User Deleted");
+});
+```
+Here We have created a middleWare function for __/admin__ Route So any Request coming to __/admin/getAllData__ Route wil be first go through
+/admin middleware then it will go to the Requested route. In this case we had requested __/admin/getAllData__.
+
+ We can also create our middleware function inside utils folder (/src/utils) and export it and then import it inside __app.js__ and 
+ use it as middleware function. This is good practice to keep our code clean and organized.
+ For eg: 
+ ```javascript
+ const adminAuth = (req, res, next) => {
+  console.log("Admin Auth is HIT");
+  const token = "xyz";
+  const isAdminAuthorized = token === "xyz";
+
+  if (isAdminAuthorized) {
+    next();
+  } else {
+    res.status(401).send("Not Authorized:");
+  }
+};
+
+module.exports = {
+  adminAuth,
+};
+```
+created a auth.js file inside /src/middleware/auth.js and written the code for middleware function then exported it and after importing it inside app.js used it on "/admin" routes.
+```javascript
+const { adminAuth } = require("./middlewares/auth");
+
+app.use("/admin", adminAuth);
+```
+Here we have used our "adminAuth" on "/admin" route and it will work on all the requests coming to /admin Route.
+
+Instead of using middleware like above we can also use it like below if we just single htpp methods.
+But if we have multiple http methods for that particular Route then we can define it separately as above for that particular Route and it will work on all Requests coming to that Route.
+```javascript
+app.get("/admin/getAllData",adminAuth, (req, res) => {
+  //Auth Logic Here
+  res.send("All User Data");
+});
+```
