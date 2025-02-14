@@ -373,17 +373,18 @@ To Update the whole Data of the user we have to make a __PUT__ API call to serve
 ## Optional Chaining in API Path (Advanced Routing Techniques)
 
 In our routes we can make our path optional by putting a question mark.
- for eg: If we have a path __/test/abc__ then we can make the path optional by using a question mark after the path like __/test/ab?c__ so here b is optional like if we write the full path (_/test/abc_) on postman so this path will work but if we write it like ( _/test/ac_ ) then it will also point to that path as we have kept b as optional.
+ for eg: If we have a path __/test/abc__ then we can make the path optional by using a question mark after the path like __/test/ab?c__ so here __b__ is optional like if we write the full path (_/test/abc_) on postman so this path will work but if we write it like ( _/test/ac_ ) then it will also point to that path as we have kept __b__ as optional.
 
  ## (+) Opeartor in Path
-We can also add (+) operator in path so we can add multiple letters in front of which we have added(+) operator in our path unless starting and ending letter is same for eg: __/test/ab+c__ so if we try to acess the path like __/test/abbbbbbbbbbc__ then as well it will work.
+ We can use (+) operator in path to match one or more of the preceding element. For eg
+We can also add (+) operator in path to match one or more of the preceding element in our path unless starting and ending letter is same for eg: __/test/ab+c__ so if we try to acess the path like __/test/abbbbbbbbbbc__ then as well it will work.
 
-o ## (*) Opeartor in Path
+## (*) Opeartor in Path
 we can also write(*) opeartor in path and it means unless and until starting and ending letters match we can give anything in between the path for eg: we have path __/test/ab*cd/__ then we can write it like __/test/aberhjkshgfdfghjkjhcd/__ and it will hit the path unless the start and 
 ending letters match.
 
  ## () Opeartor in Path
-Here we can use __()__ to group some characters in our path for eg: if we have path __/test/a(bc)?d__ then even if we do not write the bc in our path it will hit the correct path __/test/ad__ as we made the (bc) optional in our path by using (?) opeartor. We Can also Write REGEX in our Api paths to make more Dynamic.
+Here we can use __()__ to group some characters in our path for eg: if we have path __/test/a(bc)?d__ then even if we do not write the bc in our path it will hit the correct path __/test/ad__ as we made the (bc) optional in our path by using (?) opeartor. We Can also Write REGEX in our Api paths to make them more Dynamic.
 Also __/test/a(bc)+d__ we can make our path to accept random values (here bc in this case ) using (+) Operator.
 
 ## Regex in API Path
@@ -415,7 +416,7 @@ http://localhost:3000/user?userid=101&name=John
 So here { userid: '101', name: 'John' } will be printed to Dev Console
 If we want only values to be printed then we can use __req.query.name__ and it will print only "John" to the console. 
 
-## Routes Dynamic:
+##  Dynamic Routes:
 We can also add Dynamic routes by using "/abc/:user" so here (:) giving colon we can add dynamic path and we can read it by using req.params so here userId is the dynamic path which we are accessing. for eg 
 ```javascript
 (app.get("/users/:userId", (req, res) => 
@@ -427,3 +428,62 @@ So here we have made our Routes Dynamic by  adding "/users/:userId" so Here user
 /users/ and it will printed to dev console using (__req.params__).
 
 So like this we can add any Route After Colon (:) and every parameter that we have passd in our url we can receive using req.params.
+
+## Route Handler
+```javascript
+app.use("/user",()=>{
+//This function is known as route Handler
+})
+```
+We can handle any incoming http request (GET,PUT, POST,DELETE) with the above request handler as we have used __app.use__ method
+Inside our Route handler function we can pass 2 arguments req and res.
+```javascript
+app.use("/user",(req,res)=>{
+//This function is known as route Handler
+res.send("This is my route 1st handler ")
+})
+```
+And using the res parameter we provide a response to our client like above.
+
+Similarly we can use any type of http method (GET,PUT,POST,DELETE) for handling that particular type of request, But if we use __app.use__ then 
+we can respond to any http method.
+
+```javascript
+app.use("/user",(req,res)=>{
+//This function is known as route Handler
+
+})
+```
+when we do not send any response from our route handler like above and someone tries to access this particular path then the client system sending the request to this path will go into infinite loop as it will not receive any response from the server(res).
+
+We can add multiple route handler functions inside a particular Route.
+```javascript
+app.use("/user",()=>{
+  //This function is known as route Handler 1
+  res.send("This is my route 1st handler ")
+},(req,res)=>{
+  //This function is known as route Handler 2
+  res.send("This is my route 2nd handler ")
+},(req,res)=>{
+  //This function is known as route Handler 3
+  res.send("This is my route 3rd handler ")
+})
+```
+Here as we have added multiple Route Hanlder functions inside a single Route but when we will hit the "/user" path then the response of just 
+1st Route handler will be returned to client it will not go to the next Route Handlers as we do not have passed the parameter __next__ inside our function.
+So to make our Route handler to go for the next function if we do not provide any response in the first function we have to sepcify one more 
+parameter __next__ inside our function and then we have to use that parameter inside our function 
+
+for eg:
+```javascript
+app.use("/user",(req,res,next)=>{
+  //This is first Route Handler Function 
+  //We have provided no Reponse inside it 
+  //but we can call our next() parameter so the request goes  to next function
+  next()
+},(req,res,next)=>{
+  //This is second Route Handler Function
+  res.send("This is my route 2nd handler Response")
+})
+```
+Now if we hit the above path the request will go to next function if it does not get any response from first request handler.
