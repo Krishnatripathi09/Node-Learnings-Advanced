@@ -14,6 +14,10 @@ app.use(
     next();
   },
   (req, res, next) => {
+    next()
     res.send("This is 2nd Response");
+  },
+  (req,res,next)=>{
+res.send("This is 3rd Response:")
   }
 );

@@ -486,4 +486,47 @@ app.use("/user",(req,res,next)=>{
   res.send("This is my route 2nd handler Response")
 })
 ```
-Now if we hit the above path the request will go to next function if it does not get any response from first request handler.
+Now if we hit the above path the request will go to next Request handler if it does not get any response from first request handler.
+
+But If we provide a response to the Client through our first request handler and still use __next()__ then it will throw an Error that 
+ _Error_ [ERR_HTTP_HEADERS_SENT]: _Cannot set headers after they are sent to the client_.
+ It means that once the reponse is sent to the client then again it can-not send the response to same header as our client while making the request creates a connection to server and once it receives the response the connection is closed.
+
+ So when we define _next()_ in our route Handler and do not provide response in any route handler then it will throw an error that 
+ cannot GET/user as it was expecting another route handler and as we have not defined any other route Handler then it will throw 
+ an error that __cannot GET/user__
+
+ for Eg:
+ ```javascript
+app.use("/user",(req,res,next)=>{
+ 
+  next()
+},(req,res,next)=>{
+  
+  //using next () here 
+  next()
+}),
+(req,res,next)=>{
+  //This is third Route Handler Function
+  next()
+}
+```
+So In the Above case it will throw an Error.
+But If we do not use __next()__ and do not provide any response then the request from client will go in infinite loop.
+
+We can define as many Route Handlers inside our route as many we want we can also wrap our route handlers inside an array
+for eg:
+ ```javascript
+app.use("/user",[(req,res,next)=>{
+ 
+  next()
+},(req,res,next)=>{
+  
+  //using next () here 
+  next()
+},
+(req,res,next)=>{
+  //This is third Route Handler Function
+  next()
+}]).
+
