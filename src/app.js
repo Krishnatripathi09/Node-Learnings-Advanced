@@ -6,12 +6,22 @@ app.listen(3000, () => {
   console.log("Server is successfully Listening on Port 3000 😀");
 });
 
-app.use("/user", (req, res, next) => {
-  // This is request handler function
-  //Got No response here so going to next request Handler
-  res.send("This is first Response");
-  next();
+app.use("/admin", (req, res, next) => {
+  const token = "xyzADC";
+  const isAdminAuthorized = token === "xyz";
+
+  if (isAdminAuthorized) {
+    next();
+  } else {
+    res.status(401).send("Not Authorized:");
+  }
 });
-app.use("/user", (req, res) => {
-  res.send("This is separate Response");
+
+app.get("/admin/getAllData", (req, res) => {
+  //Auth Logic Here
+  res.send("All User Data");
+});
+
+app.get("/admin/deleteUser", (req, res) => {
+  res.send("User Deleted");
 });

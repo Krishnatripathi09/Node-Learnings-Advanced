@@ -547,4 +547,51 @@ app.use("/user",()=>{
  Proper resonse.
  But In above case it will throw error that cannot set headers after the response has been sent as we are sending the response in first 
  route handler it self.
+
+## MIDDLE-WARE
+These functions that we have defined where the route is going from one function to another are known as middlewares.
+*** Middleware functions are functions that have access to the request object (req), the response object (res), and the next middleware function in the application’s request-response cycle. These functions can modify the request and response objects, end the request-response cycle, or call the next middleware function in the stack. ***
+
+So In above example we have already used middlewares and seen how one function transfers the request to other function.
+ ```javascript
+app.use("/user",
+(req,res,next)=>{
+ console.log("Middle-Ware Executed")
+  next()
+},(req,res,next)=>{
+  
+  //using next () here 
+  next()
+}),
+(req,res,next)=>{
+  //This is third Route Handler Function
+  res.send("This is last Function in Middle-Ware Example")
  
+}
+```
+Here we have used 2-Middlewares and each middleware is calling the next middleware function using next() function.
+
+## Need Of Middle-Wares
+
+Suppose we have 2 API's which can be only aceessed by a user with Admin Credentials:
+```javascript
+app.get("/admin/getAllData",(req,res)=>{
+  //Auth Logic Here
+  res.send("All User Data")
+})
+
+app.get("/admin/deleteUser",(req,res)=>{
+  res.send("User Deleted")
+})
+```
+So Here we can add a middleware to check if the user is admin or not before accessing these API's.
+And also suppose we write the authentication logic in one of the above API's and we also need the auth logic in our 2nd API as well 
+so we have to write the same Auth Logic Twice so instead of doing that we can write a auth middleware function which will handle only the 
+Authentication logic that is to check if a user is Authenticated or Not If user is Authenticated with correct Credentials and permission then
+he will allowed to access the __Admin__ API's else he will be redirected to Authentication Page or Not Authorized Page depending upon the Permissions.
+
+## Diff in App.use and App.all
+app.use("/user", ...) runs for all requests starting with __/user__, including /user/profile, /user/settings, etc.
+
+app.all("/test") will handle GET, POST, PUT, DELETE, etc., but only for __/test__ (not /test/something)
+
