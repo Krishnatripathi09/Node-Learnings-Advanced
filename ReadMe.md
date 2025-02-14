@@ -528,5 +528,23 @@ app.use("/user",[(req,res,next)=>{
 (req,res,next)=>{
   //This is third Route Handler Function
   next()
-}]).
+}])
+```
+We can also define our route handlers separately like below instead of chaining them in one Route.
 
+for eg:
+```javascript
+app.use("/user",()=>{
+  res.send("This is First Route Handler")
+  next();
+})
+
+app.use("/user",()=>{
+  res.send("This is Second Route Handler")
+})
+ ```
+ So Here instead of chaining the Route Handlers we have defined them separately and it will work fine unless and until we are sending 
+ Proper resonse.
+ But In above case it will throw error that cannot set headers after the response has been sent as we are sending the response in first 
+ route handler it self.
+ 
