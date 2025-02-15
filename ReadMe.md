@@ -1053,4 +1053,36 @@ app.post("/signup", async (req, res) => {
 So Now when someuser sends the json data through signup API request Body our middleware first receives that request and converts that json 
 data into JS object and put it into the req.body and then our signup method receives that req.body and Now we are creating the new 
 instance of the User Model using the data which we are sending in th API.
-and then we are saving that data in DataBase
+and then we are saving that data in DataBase.
+
+## Reading the Data from the Database(Get API).
+Read more about how we can make a get request : (__https://mongoosejs.com/docs/api/model.html#Model.find()__)
+To get all the user from the DataBase we have to make GET API call on our Database:
+```javascript
+app.get("/feed", async (req, res) => {
+  const user = await User.find({});
+  res.send(user);
+});
+```
+Here we are using the find method of the User Model to get all the user from the Database.
+
+To find a single user by __email__ which is coming along with request body we can extract that email from request body then 
+we can use _User.find({email:email})_ on user model.
+Read it more : __https://mongoosejs.com/docs/api/model.html#Model.findById()__
+```javascript
+app.get("/user", async (req, res) => {
+  const email = req.body.email;
+  const user = await User.find({ email: email });
+  // console.log(user);
+  res.send(user);
+});
+```
+Then we can send the response to client using res.send()
+We can also send the data along with some string using Template strings:
+for eg:
+```javascript
+res.send(`User Data is ====>> ${JSON.stringify(user)}`);
+```
+
+
+
