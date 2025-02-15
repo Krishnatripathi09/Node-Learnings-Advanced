@@ -674,5 +674,130 @@ app.use("/",(err,req,res,next)=>{
     res.status(500).send("Something Went Wrong")
   }
 })
-``` 
+```
 So here we have gracefully handled all the errors that are coming in our Application 
+
+So suppose we have a api to get the data for all Users and it is throwing some error 
+```javascript
+app.get("/getUserData", (req, res) => {
+  throw new Error("This is error");
+  res.send("Data is Here");
+});
+``` 
+And we have a Route handler function afterwards to handle error 
+```javascript
+app.get("/getUserData", (req, res) => {
+  throw new Error("This is error");
+  res.send("Data is Here");
+});
+
+app.use("/", (err, req, res, next) => {
+  if (err) {
+    res.status(500).send("Something Went Wrong");
+  }
+});
+```
+So here we have handled the error that is coming from our previous Route Handler function. And we have
+sent a response to the client with a status code of 500 and a message that something went wrong.
+
+But if we have the same error handler function before the "/getUserData" then it will not throw the proper response as while executing the code
+Js Engine Encounters the Error Later Not before
+For Eg:
+```javascript
+
+app.use("/", (err, req, res, next) => {
+  if (err) {
+    res.status(500).send("Something Went Wrong");
+  }
+});
+
+app.get("/getUserData", (req, res) => {
+  throw new Error("This is error");
+  res.send("Data is Here");
+});
+```
+So here response from error handler will  not be sent to user instead the error from our "/getUserData" will be sent to user.
+So that's why we should always keep our error Handler function in the End.
+
+## Connecting to DataBase using Mongoose
+
+To connect to DataBase using mongoose we have to first install mongoose in our project using __npm i mongoose__.
+We have created a folder config inside that we have our database file in which we will write code to connect to database.
+
+```javascript
+const mongoose = require('mongoose')
+```
+So we will just import mongoose in our __database.js__ and then we just simply use __mongoose.connnect()__ and inside that we can pass
+our connection string "mongodb+srv://NodeUser:<dbPassword>@nodelearning1.mngbs.mongodb.net/" but this is not a good way to connect 
+because __mongoose.connect__ returns a promise that whether it connected to Database successfully or not.
+So a good way to do this is to wrap it inside a __async__ function and await it.
+```javascript
+const mongoose = require('mongoose')
+
+const  connectDB = async()=>{
+await mongoose.connect('mongodb+srv://NodeUser:<dbPassword>@nodelearning1.mngbs.mongodb.net/')
+}
+connectDB()
+  .then(() => {
+    console.log("Connection to DataBase is SuccessFul 😁");
+  })
+  .catch((err) => {
+    console.log("Error Occured ===>", err);
+  });
+```
+So here we have created a __async__ function __connectDB__ and inside that we have used __await__ to await our connection till it connects or to database or rejects then we have logged to console if __Successfully Connected to DataBase__ if database connection was successfull and if 
+it throws any error then we have handled that as well.
+
+Next to connect to database when we start our server we need to import it in our __app.js__ as our server will not know about connecting 
+to database until we import it in __app.js__
+Once we import it in __app.js__
+```javascript
+require("./middlewares/config/database");
+```
+Then it will automatically connect to database and print _Connection to DataBase is SuccessFul 😁_
+Or If connectionis not successful then it will throw error depending upon the Error Occured.
+So that's how we can connect to database using mongoose.
+
+## Creating a DataBase:
+Now to create a database directly in our cluster we can specify the name of the DataBase after our connection string.
+```javascript
+mongodb+srv://NodeUser:<dbPassword>@nodelearning1.mngbs.mongodb.net/devTinder
+```
+So here in connection string we have passed the name of the DataBase in last which is __devTinder__.
+
+We should always first establish the Server Connection to Database then only start the server to listen to incoming requests.
+Because our server is Already started listening to incoming requests but we have still not connected to Database so users trying to fetch there
+data might recieve an error from the Database.
+
+So to do that we will not directly connect to database in our __database.js__ instead we will export the __connectDB__ function from __database.js__ and import it in our __app.js__ and we will pass our __app.listen__ after the DB connection is successfull.
+```javascript
+const mongoose = require("mongoose");
+
+const connectDB = async () => {
+  await mongoose.connect(
+    "mongodb+srv://shreejinetwork702:<database_pwd>@cluster0.dhjwe.mongodb.net/devTinder"
+  );
+};
+module.exports = connectDB;
+```
+Here we have exported our connectDB function and then we can import it in our __app.js__
+```javascript
+const express = require("express");
+require("./middlewares/config/database");
+const connectDB = require("./middlewares/config/database");
+const { connect } = require("mongoose");
+const app = express();
+
+connectDB()
+.then(() => {
+    console.log("Connection to DataBase is SuccessFul 😁");
+    app.listen(3000, () => {
+        console.log("Server is successfully Listening on Port 3000 😀");
+      });
+    
+  })
+  .catch((err) => {
+    console.log("Error Occured ===>", err);
+  });
+```
+And then we pass our __app.listen__ inside __connectDB()__ to first connect to Database and then start the server.

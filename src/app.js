@@ -1,19 +1,20 @@
 const express = require("express");
-const { adminAuth } = require("./middlewares/auth");
+require("./middlewares/config/database");
+const connectDB = require("./middlewares/config/database");
+const { connect } = require("mongoose");
 
 const app = express();
 
-app.listen(3000, () => {
-  console.log("Server is successfully Listening on Port 3000 😀");
-});
 
-app.get("/getUserData", (req, res) => {
-  throw new Error("This is error");
-  res.send("Data is Here");
-});
+connectDB()
+.then(() => {
+    console.log("Connection to DataBase is SuccessFul 😁");
+    app.listen(3000, () => {
+        console.log("Server is successfully Listening on Port 3000 😀");
+      });
+    
+  })
+  .catch((err) => {
+    console.log("Error Occured ===>", err);
+  });
 
-app.use("/", (err, req, res, next) => {
-  if (err) {
-    res.status(500).send("Something Went Wrong");
-  }
-});
