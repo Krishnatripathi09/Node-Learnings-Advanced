@@ -6,7 +6,7 @@ const User = require("./models/user");
 
 app.use(express.json());
 app.post("/signup", async (req, res) => {
-  const user = new User(req.body.j);
+  const user = new User(req.body);
   try {
     await user.save();
     res.send("Data Saved SucessFully");
@@ -17,15 +17,19 @@ app.post("/signup", async (req, res) => {
 
 //Feed API to get all the data from the DataBase:
 app.get("/feed", async (req, res) => {
-  const user = await User.find({});
-  res.send(user);
+  try {
+    const user = await User.find({});
+    res.send(user);
+  } catch (err) {
+    res.status(400).send("Something Went Wrong ");
+  }
 });
 
 // To get a user using email
 app.get("/user", async (req, res) => {
   const userEmail = req.body.email;
   try {
-    const user = await User.find({ email: userEmail });
+    const user = await User.findOne({ email: userEmail });
     if (user.length === 0) {
       res.status(404).send("User Not Found with This Email 😐");
     } else {
