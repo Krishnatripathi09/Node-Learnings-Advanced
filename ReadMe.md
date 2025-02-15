@@ -1083,6 +1083,33 @@ for eg:
 ```javascript
 res.send(`User Data is ====>> ${JSON.stringify(user)}`);
 ```
+Instead of writing our code like above we should always wrap it inside a __try{}catch()__ block to handle any unexpected Error.
+```javascript
+  try {
+    const user = await User.find({ email: userEmail });
+    res.send(user);
+  } catch (err) {
+    res.status(400).send("Something Went Wrong.");
+  }
+  ```
+and also we should make our find method await as it takes some time to find the user.
 
-
-
+## When User Not Found with Provided Mail:
+So when a user is not found we can send the appropriate response that user with provided email is not Found in DataBase.
+```javascript
+app.get("/user", async (req, res) => {
+  const userEmail = req.body.email;
+  try {
+    const user = await User.find({ email: userEmail });
+    if (user.length === 0) {
+      res.status(404).send("User Not Found with This Email 😐");
+    }else {
+      res.send(user);
+    }
+  } catch (err) {
+    res.status(400).send("Something Went Wrong.");
+  }
+  // console.log(user);
+});
+```
+when a user is not found in DB then we are sending that user with this email is Not Found:

@@ -23,10 +23,18 @@ app.get("/feed", async (req, res) => {
 
 // To get a user using email
 app.get("/user", async (req, res) => {
-  const email = req.body.email;
-  const user = await User.find({ email: email });
+  const userEmail = req.body.email;
+  try {
+    const user = await User.find({ email: userEmail });
+    if (user.length === 0) {
+      res.status(404).send("User Not Found with This Email 😐");
+    } else {
+      res.send(user);
+    }
+  } catch (err) {
+    res.status(400).send("Something Went Wrong.");
+  }
   // console.log(user);
-  res.send(user);
 });
 
 connectDB()
