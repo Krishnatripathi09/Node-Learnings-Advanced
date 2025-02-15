@@ -6,17 +6,19 @@ const User = require("./models/user");
 
 app.post("/signup", async (req, res) => {
   const userObj = {
-    firstName: "Krishna",
+    firstName: "Dev",
     lastName: "Tripathi",
-    email: "krishna@gmail.com",
-    password: "krishna123",
+    email: "Dev@gmail.com",
+    password: "Deva123",
   };
 
   const user = new User(userObj);
-
-  await user.save();
-
-  res.send("Data Saved SucessFully");
+  try {
+    await user.save();
+    res.send("Data Saved SucessFully");
+  } catch (err) {
+    res.status(400).send("Error Sending the data:" + err.message);
+  }
 });
 
 connectDB()

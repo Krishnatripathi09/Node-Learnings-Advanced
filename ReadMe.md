@@ -938,3 +938,20 @@ app.post("/signup", async (req, res) => {
 So after doing _await user.save()_ and  marking our function as _async_, we have created a post API to save the data to our User Collection
 To test this we can go to postman and hit our "http://localhost:3000/signup" sign up API and our database(_devTinder_) will be created inside 
 which our user collection will be created and inside our collection our document will be saved. 
+
+Whenever we add a document in MongoDb then MongoDB Automatically gives it a __Id__ fieldand and (__v) field. If we specify a id field in our 
+user schema and while passing the data we can also pass the id manually.
+__v is used to keep a track of version of the data initially when a document is created the version is 0 and it chaanges according to 
+updates we make in document.
+
+we should always our DB opeartions in try-catch block to catch a potential
+error that might occur while saving the data to our database.
+```javascript
+ const user = new User(userObj);
+  try {
+    await user.save();
+    res.send("Data Saved SucessFully");
+  } catch (err) {
+    res.status(400).send("Error Sending the data:" + err.message);
+  }
+  ```
