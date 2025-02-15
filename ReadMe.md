@@ -944,7 +944,7 @@ user schema and while passing the data we can also pass the id manually.
 __v is used to keep a track of version of the data initially when a document is created the version is 0 and it chaanges according to 
 updates we make in document.
 
-we should always our DB opeartions in try-catch block to catch a potential
+we should always wrap our  DB opeartions in try-catch block to catch a potential
 error that might occur while saving the data to our database.
 ```javascript
  const user = new User(userObj);
@@ -955,3 +955,102 @@ error that might occur while saving the data to our database.
     res.status(400).send("Error Sending the data:" + err.message);
   }
   ```
+
+## Diff in JS Object and JSON 
+
+## Creating an API to send the user Data instead of Hardcoding:
+So the above data that we have created for user should also be coming from User.
+```javascript
+ {
+    firstName: "Krishna",
+    lastName: "Tripathi",
+    email: "krishna@gmail.com",
+    password: "krishna123",
+  };
+  ```
+So to Make it dynamic we can pass this from our post API in request Body and to do that we have to go to postman and 
+and inside our POST http method select the _BODY_ and select _RAW_ and select _JSON_ and then paste the data in json format and then we can send
+it along with the Request Body:
+for eg:
+```json
+{
+	"firstName":"KrishnaT",
+    "lastName":"Tripathi",
+    "email":"krisht@gmail.com",
+    "password":"Pwdkrish@678"
+}
+```
+Here we have filled our data in Json format inside request body.
+
+Now when we send the data from our POST API in request body,then we have to read that from that but we cannot do that directly
+
+```javascript
+for eg:
+
+app.post("/signup", async (req, res) => {
+  console.log(req);
+  //  const userObj = {
+  //   firstName: "Krishna",
+  //   lastName: "Tripathi",
+  //   email: "krishna@gmail.com",
+  //   password: "krishna123",
+  // };
+
+  //   const user = new User(userObj);
+  //   try {
+  //     await user.save();
+  //     res.send("Data Saved SucessFully");
+  //   } catch (err) {
+  //     res.status(400).send("Error Sending the data:" + err.message);
+  //   }
+});
+```
+Here req Body does not contain only data but other things as well so the incoming message is very big which we can see in our 
+console as we have logged our _req_ Object in console.
+
+So to read the data we have to do:
+```javascript
+console.log(req.body)
+```
+Now as we have done __console.log(req.body)__ but here again it will log _undefined_ in console as the data that we our sending in our request
+body is in __JSON__ format and our server is not able to read that __JSON__ data.
+So to read that data we will need a middleware (as we are going to use that middleware in ALL API's that's why we will created a middleware)
+which will check the incoming request and convert the json into JS object and put it into the req Body so that we can access that data directly.
+And we do not need to create that middleware but __Express__ has already given us that middleware directly.
+Read More About it Here :__https://expressjs.com/en/5x/api.html#express.json__
+
+So we can use that middleware directly instead of creating our own:
+for eg: we can pass the middleware to __app.use()__ method and it will work on all the incoming routes by default.
+```javascript
+app.use(express.json())
+```
+So It adds middleware that automatically parses incoming JSON data from the request body and converts it into a JavaScript object that our server can understand. If we do not use this middleware then req.body will be undefined because Express doesn’t parse JSON by default.
+So now we do not need to write any middleware to convert json data to server understandable code instead we can just use this middleware 
+and everything will work fine.
+It is essential for handling __POST__, __PUT__, or __PATCH__ requests with JSON payloads
+
+Now when we log our __console.log(req.body)__ we can see the data in below format in our console as the middleware converts it JS Object.
+```javascript
+{
+  firstName: 'KrishnaT',
+  lastName: 'Tripathi',
+  email: 'krisht@gmail.com',
+  password: 'Pwdkrish@678'
+}
+```
+so now in our app.js in our signup method we have to remove our __userObj__ and just have to replace it with __req.body__.
+```javascript
+app.post("/signup", async (req, res) => {
+  const user = new User(req.body);
+  try {
+    await user.save();
+    res.send("Data Saved SucessFully");
+  } catch (err) {
+    res.status(400).send("Error Sending the data:" + err.message);
+  }
+});
+```
+So Now when someuser sends the json data through signup API request Body our middleware first receives that request and converts that json 
+data into JS object and put it into the req.body and then our signup method receives that req.body and Now we are creating the new 
+instance of the User Model using the data which we are sending in th API.
+and then we are saving that data in DataBase

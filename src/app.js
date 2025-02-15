@@ -4,15 +4,9 @@ const connectDB = require("./middlewares/config/database");
 const app = express();
 const User = require("./models/user");
 
+app.use(express.json());
 app.post("/signup", async (req, res) => {
-  const userObj = {
-    firstName: "Dev",
-    lastName: "Tripathi",
-    email: "Dev@gmail.com",
-    password: "Deva123",
-  };
-
-  const user = new User(userObj);
+  const user = new User(req.body);
   try {
     await user.save();
     res.send("Data Saved SucessFully");
