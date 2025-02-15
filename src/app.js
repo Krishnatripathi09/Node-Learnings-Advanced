@@ -21,6 +21,14 @@ app.get("/feed", async (req, res) => {
   res.send(user);
 });
 
+// To get a user using email
+app.get("/user", async (req, res) => {
+  const email = req.body.email;
+  const user = await User.find({ email: email });
+  // console.log(user);
+  res.send(user);
+});
+
 connectDB()
   .then(() => {
     console.log("Connection to DataBase is SuccessFul 😁");
