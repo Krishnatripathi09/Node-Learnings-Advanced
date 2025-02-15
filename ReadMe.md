@@ -206,9 +206,35 @@ __"const express = require("express")"__
 
 So here we have required the _express_ and it is coming from our _node_modules_ folder in which it is installed.
 And next we will create an instance of our express Js Application by doing.
-
+```javascript
 const app = express()
+```
+We need to create an instance of our __express()__ because If we use express() directly then it will create 2 separate instance of the 
+express separately 
 
+for eg:
+```javascript
+
+const express = require("express");
+
+express().get("/", (req, res) => {
+  res.send("Hello World");
+});
+
+express().listen(3000, () => {
+  console.log("Server running on port 3000");
+});
+```
+So here 
+```javascript
+express() creates a new Express instance every time it is called.
+You have two separate instances:
+First instance (express().get("/")): Handles GET requests.
+Second instance (express().listen(3000)) starts a server.
+Since these are two different instances, the instance listening on port 3000 doesn’t know about the routes defined in the other instance. That’s why the / route won’t work.
+```
+To ensure that the same instance handles both the routes and the server, we should store the instance in a variable (app):
+✅ Now, app is a single instance managing both routes and the server, so everything will work correctly.
 
 Creating an instance of express means that we are assigning the instance of express in that particular variable and we no longer need to write express everytime instead we can get all the properties or methods from the app.
 This app object inherits all the properties and methods of Express.
@@ -720,6 +746,7 @@ So here response from error handler will  not be sent to user instead the error 
 So that's why we should always keep our error Handler function in the End.
 
 ## Connecting to DataBase using Mongoose
+REFER to Document : __https://mongoosejs.com/docs/index.html__
 
 To connect to DataBase using mongoose we have to first install mongoose in our project using __npm i mongoose__.
 We have created a folder config inside that we have our database file in which we will write code to connect to database.
@@ -759,7 +786,9 @@ Or If connectionis not successful then it will throw error depending upon the Er
 So that's how we can connect to database using mongoose.
 
 ## Creating a DataBase:
-Now to create a database directly in our cluster we can specify the name of the DataBase after our connection string.
+A cluster in MongoDB is a set of connected MongoDB servers that work together to store and process data. Clusters help with scalability, fault tolerance, and high availability.
+
+Now to create a database directly in our __cluster__ we can specify the name of the DataBase after our connection string.
 ```javascript
 mongodb+srv://NodeUser:<dbPassword>@nodelearning1.mngbs.mongodb.net/devTinder
 ```
@@ -801,3 +830,111 @@ connectDB()
   });
 ```
 And then we pass our __app.listen__ inside __connectDB()__ to first connect to Database and then start the server.
+
+## Creating an Schema :
+__Schema__:(https://mongoosejs.com/docs/guide.html#models)
+A schema in MongoDB defines the structure of documents in a collection. While MongoDB is schema-less (you can insert documents with different fields), using a schema helps maintain consistency and data integrity.
+
+To create our Schema we will create a folder Named __models__ inside which we will have our __user.js__ file 
+Inside which we will define our user Collection like what fields the user collection is gonna Have.
+```javascript
+const mongoose = require("mongoose");
+const userSchema = mongoose.schema({
+
+})
+```
+So we will import our mongoose library and schema is a function on top of mongoose inside which we will pass an object 
+inside which we will define the parameters that an user will have like name,age etc.
+so when we pass a field inside our schema we will also have a type of that field whether it is a string or number etc.
+
+```javascript
+const userSchema = new mongoose.Schema({
+  firstName: {
+    type: String,
+  },
+  lastName: {
+    type: String,
+  },
+  email: {
+    type: String,
+  },
+  password: {
+    type: String,
+  },
+});
+```
+So this schema tells us what all fields we are gonna store in for a User in Database.
+
+## Using Our Schema:
+Once we create our Schema we will create a Model from our Schema.
+
+A model in Mongoose is a JavaScript representation of a MongoDB collection. It provides an interface to interact with the database, allowing us to create, read, update, and delete (CRUD) documents based on a predefined schema.
+
+After creating the schema we will create the model  using : mongoose.model
+```javascript
+const User = mongoose.model("User",userSchema)
+```
+Here we have passed the name of our Model inside as "User" and second argument is the name of our schema from which we are creating the model.
+So as we have created our Model we can start creating the API's. to interact with the User Collection.
+
+## Creating an API to SignUp a user
+To make our users register we can create a sign up api in our __app.js__ and the path will "/signup".
+To create a the data in our Resource we use post method.
+```javascript 
+app.post("/signup",(req,res)=>{
+const userObj = {
+  firstName:"Krishna",
+  lastName:"Tripathi",
+  email:"krish@gmai.com",
+  password:"krish123",
+
+
+}
+})
+```
+so suppose in our post request we have user with above details and if we want to save this user into MongoDB DataBase then we have to create 
+an instance of our User Model that we have created on userSchema. and then we will add the above data on that User Model and then 
+we will save that instance.
+
+To create the new instance of User Model we will import our User Model inside app.js from __models__ then we can create it like 
+```javascript
+app.post("/signup", (req, res) => {
+  const userObj = {
+    firstName: "Krishna",
+    lastName: "Tripathi",
+    email: "krishna@gmail.com",
+    password: "krishna123",
+  };
+
+  const user = new User(userObj);
+
+user.save();
+});
+```
+
+So here we have imported our User Model from models and then we have created a new instance of it using __new__ keyword and then we have passed our __userObj__ inside that and assigned it to user variable.
+To create the instanc we write the keyword __new__ and then we write the name of the model __User__ in our case then we pass the
+in the data of the model that we want to save so here we wanted to save the data of __userObj__ so we have passed that.
+
+Once we create the instance of our Model we do __.save()__ on that created model (user.save()) so that will be saved to our database.
+so this user.save() function  will return a promise so we have to use async and await.
+
+```javascript
+app.post("/signup", async (req, res) => {
+  const userObj = {
+    firstName: "Krishna",
+    lastName: "Tripathi",
+    email: "krishna@gmail.com",
+    password: "krishna123",
+  };
+
+  const user = new User(userObj);
+
+{
+  await user.save();
+}
+});
+```
+So after doing _await user.save()_ and  marking our function as _async_, we have created a post API to save the data to our User Collection
+To test this we can go to postman and hit our "http://localhost:3000/signup" sign up API and our database(_devTinder_) will be created inside 
+which our user collection will be created and inside our collection our document will be saved. 
