@@ -1192,3 +1192,71 @@ app.patch("/user", async (req, res) => {
 });
 ```
 Read More About it At : https://mongoosejs.com/docs/api/model.html#Model.findByIdAndUpdate()
+
+## Data Sanitization & Schema Validation:
+We  can add some-checks on our Schema fields 
+For Eg: we can keep some fields mandatory etc.
+ So If we set required to true for any field then user will have to provide that field else mongoose will not allow that 
+ field to be inserted in DataBase.
+```javascript
+const userSchema = new mongoose.Schema({
+  firstName: {
+    type: String,
+    required: true,
+  },
+  lastName: {
+    type: String,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  age: {
+    type: Number,
+  },
+  gender: {
+    type: String,
+  },
+});
+```
+SO here we have set required field to true on __firstName__ , __email__ and __password__ so if the user tries to send the data without these 
+fields then mongoose will throw an error and will not allow the data to be inserted in the database.
+
+Read More About it at "https://mongoosejs.com/docs/schematypes.html"
+
+We Should also set a __Unique__ Check on fields like email so that it should not have a user registered with same email multiple times.
+So if someone tries to register with duplicate mail Id then it will throw an error.
+So to do this we can set our __email__ field with __Unique__ to true.
+
+Suppose We want to set a default value for some field in our User schema then we can set default flag to true for that field.
+for eg:
+```javascript
+  about: {
+    type: String,
+    default: "This is default about of the User.",
+  },
+  ```
+  We have also set our Skills field to be An empty Array so while creating a User it will set the skills as an empty Array if we do 
+  not pass any skills.
+  ```javascript
+  skills: {
+    type: [String],
+  },
+  ```
+
+  We have also set our PhotoUrl field with a default value so when some user Tries to Register and he does mot provide a photoUrl 
+  then it will set the default photoUrl to him.
+  ```javascript
+   photoUrl: {
+    type: String,
+    default:
+      "https://img.freepik.com/free-vector/isolated-young-handsome-man-different-poses-white-background-illustration_632498-854.jpg?t=st=1739680454~exp=1739684054~hmac=38453e5862630ffb2aa2616c560ccfafb430ec93469bf1e36d51560ef465c839&w=740",
+  }
+  ```
+  We can also pass a lowercase flag on our email and set it true so when user tries to send the email in UpperCase it should be converted to lower-case and then it should be stored in data base.
+  
