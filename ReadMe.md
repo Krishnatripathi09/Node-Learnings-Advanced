@@ -1532,3 +1532,140 @@ photoUrl: {
   ```
   So here we have used validator to check if entered photoUrl is valid or not. If not
   then it will throw an error. So we can add validators on every field like this.
+
+  ## Encrypting our Password
+  Now we are storing our App in Plain Text and anyone who has access to DB can view our user passwords directly.
+  So to prevent this we can use a library called __bcrypt__ from __npm__.
+
+First we will create some helper functions to perform the check on the data which is coming into the Database when a user signsUp so for this we will create a utils folder and inside that we will create a file named __validation.js__
+and inside the file we can cehck validation for the comming through our signUp API.
+```javascript
+const validateSignUpData = () => {
+  const { firstName, lastName, email, password } = req.body;
+
+  if (!firstName || !lastName) {
+    throw new Error("Please Enter First Or Last Name");
+  } else if (firstName.length < 4 || firstName.length > 50) {
+    throw new Error("First Name must should be between 4 and 50 characters");
+  } else if (lastName.length < 3 || lastName.length > 50) {
+    throw new Error("Last Name must should be between 3 and 50 characters");
+  }
+  
+};
+```
+so here we have set the validation for firstName and lastName ans similarly we set validation for our email as well using the validator package
+as we have already installed it.
+```javascript 
+  else if (!validator.isEmail(email)) {
+    throw new Error("Invalid Email");
+  } else if (!validator.isStrongPassword(password)) {
+    throw new Error(
+      "Password must be at least 8 characters and should contain speacial Characters."
+    );
+  }
+  ```
+  so here we have added validation for our email and password using validator package. So this will validate our email and password for
+  mentioned conditions.
+But for this validation to work we have to import it inside app.js then we have to use it inside our /signup API to pass the data that is coming
+in our request.
+for eg:
+```javascript
+app.post("/signup", async (req, res) => {
+  try {
+    //Validattion Of Data
+    validateSignUpData(req); ///passing our request inside the validateSignUpData function
+
+    //Creating the new Instance of User Model
+    const user = new User(req.body);
+    await user.save();
+    res.send("Data Saved SucessFully");
+  } catch (err) {
+    res.status(400).send("Error:" + err.message);
+  }
+});
+```
+
+  Now next after adding these validation Checks we wil now Encrypt our password and then store it and the package that we are going to use is 
+  __BCRYPT__. We can install it using __npm i bcrypt__
+  Now we can extract the password from request body and then we can use brcypt on that password 
+  ```javascript
+     app.post("/signup", async (req, res) => {
+  try {
+    //Validattion Of Data
+    validateSignUpData(req);
+    const { password } = req.body;
+
+    //Encrypt the Password
+const passwordHash = bcrypt.hash(password,10)
+    //Creating the new Instance of User Model
+    const user = new User(req.body);
+    await user.save();
+    res.send("Data Saved SucessFully");
+  } catch (err) {
+    res.status(400).send("Error:" + err.message);
+  }
+});
+```
+so here to encrypt the password we are using bcrypt and we will use __bcrypt.hash__ to hash our password. Inside the bcrypt.hash
+we will pass our extracted password and then we will pass the salt of password.
+***What is Salt***
+Salt is a random value that is added to the password before hashing. It helps to prevent rainbow table
+attacks. A rainbow table is a precomputed table of hash values for common passwords. By adding a
+random salt to the password, we make it harder for an attacker to use a rainbow table to crack
+the password.
+In our password we have given 10 rounds of salt so it will generate a password and perform 10 rounds of hashing with some random gerenarted 
+salt.
+```javascript
+app.post("/signup", async (req, res) => {
+  try {
+    //Validation Of Data
+    validateSignUpData(req);
+    const { password } = req.body;
+
+    //Encrypt the Password
+    const passwordHash = await bcrypt.hash(password, 10);
+    console.log(passwordHash);
+
+    //Creating the new Instance of User Model
+    const user = new User(req.body);
+    await user.save();
+    res.send("Data Saved SucessFully");
+  } catch (err) {
+    res.status(400).send("Error:" + err.message);
+  }
+});
+```
+So the password that is Generated is now a Random String of Random Characters which cannot be decoded easily.
+
+Also when we are creating the new instance of User Model and we are passing the __req.body__ inside it instead we should explicitly 
+mention the fields which we are going to receive inside the body and then extarct them instead of sending the full Body.
+So if someone (Attacker) tries to send some random data it will ignore that as we are specifically extracted somed fields which we are 
+going to use.
+for eg: 
+```javascript
+app.post("/signup", async (req, res) => {
+  try {
+    //Validation Of Data
+    validateSignUpData(req);
+    const {firstName,lastName, email,password } = req.body;
+
+    //Encrypt the Password
+    const passwordHash = await bcrypt.hash(password, 10);
+    console.log(passwordHash);
+
+    //Creating the new Instance of User Model
+    const user = new User({firstName,lastName,email,password:passwordHash});//Extract all the fields that are coming inside the request body and then save them
+    await user.save();
+    res.send("Data Saved SucessFully");
+  } catch (err) {
+    res.status(400).send("Error:" + err.message);
+  }
+});
+```
+So we have extracted all the fields inside our req body and then we have passed the passwordHash with password so that will be stored in 
+the DataBase instead of our normal Password.
+
+So now whenever a request comes we are validating that request with validateSignUpData function and then we are hashing the password
+and then we are passing the passwordHash into password and then storing it into DataBase.
+
+So Now our password will Hashed by bcrypt and then we can store that password into DataBase.

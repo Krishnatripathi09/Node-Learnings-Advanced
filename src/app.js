@@ -3,15 +3,31 @@ require("./middlewares/config/database");
 const connectDB = require("./middlewares/config/database");
 const app = express();
 const User = require("./models/user");
+const { validateSignUpData } = require("./middlewares/utils/validation");
+const bcrypt = require("bcrypt");
 
 app.use(express.json());
 app.post("/signup", async (req, res) => {
-  const user = new User(req.body);
   try {
+    //Validattion Of Data
+    validateSignUpData(req);
+    const { firstName, lastName, email, password } = req.body;
+
+    //Encrypt the Password
+    const passwordHash = await bcrypt.hash(password, 10);
+    console.log(passwordHash);
+
+    //Creating the new Instance of User Model
+    const user = new User({
+      firstName,
+      lastName,
+      email,
+      password: passwordHash,
+    });
     await user.save();
     res.send("Data Saved SucessFully");
   } catch (err) {
-    res.status(400).send("Error Sending the data:" + err.message);
+    res.status(400).send("Error:" + err.message);
   }
 });
 
