@@ -1276,3 +1276,104 @@ for eg:
   Spo here we have passed a __validate()__ function inside which we have passed if a user's gender is not (male,female or others) then 
   throw an error.
   Refer to documentation for More Details "https://mongoosejs.com/docs/schematypes.html"
+
+  We have defined the custom validator function on gender but by default this validator function will only work on new Records that 
+  are being created into the system but it will not work on the records that already exist in the system
+  
+For eg:
+If we have any user in our system and we want to update that user's gender and we pass any value into gender apart from defalut values that we 
+have defined into it, So it will still take that gender value for that user. like Instead of updating a user with 
+"male" we update him with "BMale" so it will take this value and will not throw an error as validation is only working when we are creating 
+a new Record.
+
+So we have to Enable it to Run on the updated method as well for any existing data.
+So to do that on our Models we have different options so we can set a one option as to runValidators to true:
+Read about it Here "https://mongoosejs.com/docs/api/model.html#Model.findByIdAndUpdate()"
+```javascript
+app.patch("/user", async (req, res) => {
+  const userId = req.body.userId;
+  const data = req.body;
+  try {
+    const updatedUser = await User.findByIdAndUpdate({ _id: userId }, data, {
+      runValidators: true,
+    });
+    res.send("User Updated Successfully");
+  } catch (err) {
+    res.status(400).send("Update Failed :" + err.message);
+  }
+});
+```
+In our patch method we have set runValidators to true so we now when we try to update some user data like gender then our validator
+function in gender will also run on these updated methods as well and it will throw an error for Invalid Gender etc.
+
+So this is how we can add custom validators on our Schema.
+
+To pass the error message along with a string we have to concat our Error message with our string:
+for eg:
+```javascript
+res.status(400).send("Update Failed :" + err.message);
+```
+So now our Valiadtions will also work on data that we are going to update.
+
+Also we are not storing the TimeStam for when the user was Registered.
+
+To do that we can pass Timestamp:true in our schema 
+```javascript
+{ timestamps: true }
+
+
+const userSchema = new mongoose.Schema(
+  {
+    firstName: {
+      type: String,
+      required: true,
+      minLength: 4,
+      maxLength: 50,
+    },
+    lastName: {
+      type: String,
+    },
+    email: {
+      type: String,
+      required: true,
+      lowercase: true,
+      unique: true,
+      trim: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    age: {
+      type: Number,
+    },
+    gender: {
+      type: String,
+      validate(value) {
+        if (!["male", "female", "others"].includes(value)) {
+          throw new Error("Please Enter Valid Gender (male,female,others)");
+        }
+      },
+    },
+    photoUrl: {
+      type: String,
+      default:
+        "https://img.freepik.com/free-vector/isolated-young-handsome-man-different-poses-white-background-illustration_632498-854.jpg?t=st=1739680454~exp=1739684054~hmac=38453e5862630ffb2aa2616c560ccfafb430ec93469bf1e36d51560ef465c839&w=740",
+    },
+    about: {
+      type: String,
+      default: "This is default about of the User.",
+    },
+    skills: {
+      type: [String],
+    },
+  },
+  { timestamps: true }
+);
+```
+And it will create the TimeStamp for all the users that will be created on our server by default.
+we can also create a Field for createdAt and when we create a user we can also pass the Date but we don't need to do that 
+We can just pass the timeStamp to true and by default it will create a timestamp for our user.
+
+So Now when we create a user it will Automatically create createdAt and updatedAt timestamps for that user.
+and when we update the user it will show th updated time
