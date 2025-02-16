@@ -49,7 +49,7 @@ app.post("/signin", async (req, res) => {
     res.status(400).send("Error: " + err.message);
   }
 });
-
+Console.log("Get YOLO")
 //Feed API to get all the data from the DataBase:
 app.get("/feed", async (req, res) => {
   try {
