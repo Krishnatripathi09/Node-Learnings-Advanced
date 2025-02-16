@@ -69,15 +69,15 @@ app.patch("/user/:userId", async (req, res) => {
       throw new Error("Update not allowed on this Field");
     }
 
-    const isValidUrl = (url) => {
-      const urlRegex =
-        /^(https?:\/\/)[\w.-]+(?:\.[\w\.-]+)+(?:\/[\w\-_~:/?#[\]@!$&'()*+,;=.]+)?$/;
-      return url.match(urlRegex) !== null;
-    };
+    // const isValidUrl = (url) => {
+    //   const urlRegex =
+    //     /^(https?:\/\/)[\w.-]+(?:\.[\w\.-]+)+(?:\/[\w\-_~:/?#[\]@!$&'()*+,;=.]+)?$/;
+    //   return url.match(urlRegex) !== null;
+    // };
 
-    if (!isValidUrl(data.photoUrl)) {
-      throw new Error("Invalid Photo URL");
-    }
+    // if (!isValidUrl(data.photoUrl)) {
+    //   throw new Error("Invalid Photo URL");
+    // }
     if (!data.skills) {
       data.skills;
     } else if (data.skills.length > 5) {

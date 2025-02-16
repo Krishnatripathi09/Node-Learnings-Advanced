@@ -1455,3 +1455,80 @@ app.patch("/user/:userId", async (req, res) => {
 
 ```
 so here we have added a validation for our skills that it's length cannot be greater than 5.
+
+We have also added a Validation for our PhotoUrl using below REGEX.
+```javascript
+
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
+  const data = req.body;
+
+  try {
+    const ALLOWED_UPDATES = ["photoUrl", "about", "gender", "age", "skills"];
+    const isUpdateAllowed = Object.keys(data).every((k) =>
+      ALLOWED_UPDATES.includes(k)
+    );
+    if (!isUpdateAllowed) {
+      throw new Error("Update not allowed on this Field");
+    }
+
+    const isValidUrl = (url) => {
+      const urlRegex =
+        /^(https?:\/\/)[\w.-]+(?:\.[\w\.-]+)+(?:\/[\w\-_~:/?#[\]@!$&'()*+,;=.]+)?$/;
+      return url.match(urlRegex) !== null;
+    };
+
+    if (!isValidUrl(data.photoUrl)) {
+      throw new Error("Invalid Photo URL");
+    }
+    if (!data.skills) {
+      data.skills;
+    } else if (data.skills.length > 5) {
+      throw new Error("Skills Cannot be More than 5");
+    }
+    const updatedUser = await User.findByIdAndUpdate({ _id: userId }, data, {
+      runValidators: true,
+    });
+    res.send("User Updated Successfully");
+  } catch (err) {
+    res.status(400).send("Update Failed :" + err.message);
+  }
+});
+```
+
+Now to validate our email-Id we can use a liabrary as validating email is not a easy job.
+So to Validate our email we can use __validator__ package from __npm__ and it becomes very easy to validate email with that library.
+```javascript
+email: {
+      type: String,
+      required: true,
+      lowercase: true,
+      unique: true,
+      trim: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Invalid Email 😎 Please Enter Valid One");
+        }
+      },
+    }
+```
+  So here we have imported and used our validator function to see if entered email is valid or Not 
+Read More About it : "https://www.npmjs.com/package/validator" 
+We can also validators on our every field like above like photoUrl;
+```javascript
+photoUrl: {
+      type: String,
+      default:
+        "https://img.freepik.com/free-vector/isolated-young-handsome-man-different-poses-white-background-illustration_632498-854.jpg?t=st=1739680454~exp=1739684054~hmac=38453e5862630ffb2aa2616c560ccfafb430ec93469bf1e36d51560ef465c839&w=740",
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error(
+            "Invalid Photo URL Please Enter Valid One. This is not accepted ====> " +
+              value
+          );
+        }
+      },
+    },
+  ```
+  So here we have used validator to check if entered photoUrl is valid or not. If not
+  then it will throw an error. So we can add validators on every field like this.
