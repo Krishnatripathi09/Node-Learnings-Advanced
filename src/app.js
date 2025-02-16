@@ -31,6 +31,25 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+//Signin API
+app.post("/signin", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email: email }); ///checking if user Email Exists in DataBase or Not using User Model.
+    if (!user) {
+      throw new Error("User Not Found With This Email:");
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password); // If user exists then checking if the input password is similar to stored password
+    if (isPasswordValid) {
+      res.send("Login Successfull");
+    } else {
+      throw new Error("Invalid Password Bhau! ");
+    }
+  } catch (err) {
+    res.status(400).send("Error: " + err.message);
+  }
+});
+
 //Feed API to get all the data from the DataBase:
 app.get("/feed", async (req, res) => {
   try {

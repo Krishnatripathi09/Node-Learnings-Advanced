@@ -1669,3 +1669,27 @@ So now whenever a request comes we are validating that request with validateSign
 and then we are passing the passwordHash into password and then storing it into DataBase.
 
 So Now our password will Hashed by bcrypt and then we can store that password into DataBase.
+
+## User SignIn API.
+```javascript
+app.post("/signin", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email: email }); ///checking if user Email Exists in DataBase or Not using User Model.
+    if (!user) {
+      throw new Error("User Not Found With This Email:");
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password); // If user exists then checking if the input password is similar to stored password using bcrypt.compare(userInput password, Stored Password)
+    if (isPasswordValid) {
+      res.send("Login Successfull");
+    } else {
+      throw new Error("Invalid Password Bhau! ");
+    }
+  } catch (err) {
+    res.status(400).send("Error: " + err.message);
+  }
+});
+```
+So here we are creating a sign In API so here we will extract our email and password from the request body and then we will check 
+if the email exists in our database or not then if the user exists then we will check if the password is valid or not and if all the things
+are valid then we will send the response Login Successful OR We will send the error message for that particular Error.
