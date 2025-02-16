@@ -10,6 +10,8 @@ const userSchema = new mongoose.Schema(
     },
     lastName: {
       type: String,
+      minLength: 4,
+      maxLength: 20,
     },
     email: {
       type: String,
@@ -21,6 +23,8 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
+      minLength: 6,
+      maxLength: 40,
     },
     age: {
       type: Number,

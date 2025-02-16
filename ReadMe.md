@@ -1376,4 +1376,82 @@ we can also create a Field for createdAt and when we create a user we can also p
 We can just pass the timeStamp to true and by default it will create a timestamp for our user.
 
 So Now when we create a user it will Automatically create createdAt and updatedAt timestamps for that user.
-and when we update the user it will show th updated time
+and when we update the user it will show the updated time
+
+## API Level Validations:
+We need to also Add API level validations as when creating a user we have a check on our schema but what if a user later update his details later using Update(patch) API.
+So that's why we need to add validation at API level so that when a user is Updating his profile he can update certain fields only.
+```javascript
+const ALLOWED_UPDATES = ["userId","photoUrl","about","gender","age","skills"]
+const isUpdateAllowed = Object.keys(data).every((k)=>ALLOWED_UPDATES.includes(k))
+if(!isUpdateAllowed){
+ throw new Error ("Update not allowed on this Field")
+}
+```
+So eher we have created a variable __ALLOWED_UPDATES__ inside which we have passed the fields for which we can update our data later
+and if user tries to update any field which is not in ALLOWED_UPDATES Array then it will throw an Error that Update is not allowed on this 
+field.
+So this is how we can add validation at API level.
+But there is an Issue here that we have passed our userId as well inside __ALLOWED_UPDATES__ Array but the user Should not be able to update the userId so we can fetch user Id from our Route Parameters and to do that we have to Pass our userId in our Route. 
+and then instead of getting the userId from request Body we can get it from Req params
+```javascript
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
+  const data = req.body;
+
+  try {
+    const ALLOWED_UPDATES = [
+      "userId",
+      "photoUrl",
+      "about",
+      "gender",
+      "age",
+      "skills",
+    ];
+    const isUpdateAllowed = Object.keys(data).every((k) =>
+      ALLOWED_UPDATES.includes(k)
+    );
+    if (!isUpdateAllowed) {
+      throw new Error("Update not allowed on this Field");
+    }
+
+    const updatedUser = await User.findByIdAndUpdate({ _id: userId }, data, {
+      runValidators: true,
+    });
+    res.send("User Updated Successfully");
+  } catch (err) {
+    res.status(400).send("Update Failed :" + err.message);
+  }
+});
+```
+So here we have passed our userId in our Route and then we have fetched it from our Route Parameters. which we are sending from client
+"http://localhost:3000/user/67b17d968ae25f9cbc00bf42" so here in the path we have also sent the userId that we want to udpate (67b17d968ae25f9cbc00bf42) and in this way we can fetch it from our Route. using __req.params?.userId__
+
+We can also add a custom validation for skills as we don't want a user to insert more than 5 skills.
+```javascript
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
+  const data = req.body;
+
+  try {
+    const ALLOWED_UPDATES = ["photoUrl", "about", "gender", "age", "skills"];
+    const isUpdateAllowed = Object.keys(data).every((k) =>
+      ALLOWED_UPDATES.includes(k)
+    );
+    if (!isUpdateAllowed) {
+      throw new Error("Update not allowed on this Field");
+    }
+    if (data.skills.length > 5) {
+      throw new Error("You can only add 5 skills");
+    }
+    const updatedUser = await User.findByIdAndUpdate({ _id: userId }, data, {
+      runValidators: true,
+    });
+    res.send("User Updated Successfully");
+  } catch (err) {
+    res.status(400).send("Update Failed :" + err.message);
+  }
+});
+
+```
+so here we have added a validation for our skills that it's length cannot be greater than 5.
