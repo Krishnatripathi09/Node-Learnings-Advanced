@@ -1259,4 +1259,20 @@ for eg:
   }
   ```
   We can also pass a lowercase flag on our email and set it true so when user tries to send the email in UpperCase it should be converted to lower-case and then it should be stored in data base.
-  
+
+  We can also create a custom validation function on some fields to check if value passed by user into that field is allowed by that 
+  validate function or not.
+  for eg: Gender of a user can only be male, female or others so we can pass those values into gender.
+  ```javascript
+  gender:{
+    type:String,
+    validate(value){
+      if(!["male","female","others"].includes(value)){
+        throw new Error("Please Enter Valid Gender (male,female,others)")
+      }
+    }
+  }
+  ```
+  Spo here we have passed a __validate()__ function inside which we have passed if a user's gender is not (male,female or others) then 
+  throw an error.
+  Refer to documentation for More Details "https://mongoosejs.com/docs/schematypes.html"
