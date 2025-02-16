@@ -14,7 +14,7 @@ app.post("/signup", async (req, res) => {
     res.status(400).send("Error Sending the data:" + err.message);
   }
 });
-
+Console.log("Get YOLO")
 //Feed API to get all the data from the DataBase:
 app.get("/feed", async (req, res) => {
   try {
