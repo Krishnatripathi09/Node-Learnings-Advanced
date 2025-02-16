@@ -1113,3 +1113,82 @@ app.get("/user", async (req, res) => {
 });
 ```
 when a user is not found in DB then we are sending that user with this email is Not Found:
+
+## find One Method On User Model:
+We can use find one method to find a user if a user is registered multiple times with same email:
+It returns the Oldest document with that particular value that we have passed inside it. In our Case we are passing _email_.
+```javascript
+app.get("/user", async (req, res) => {
+  const userEmail = req.body.email;
+  try {
+    const user = await User.findOne({ email: userEmail });
+    if (user.length === 0) {
+      res.status(404).send("User Not Found with This Email 😐");
+    } else {
+      res.send(user);
+    }
+  } catch (err) {
+    res.status(400).send("Something Went Wrong.");
+  }
+  // console.log(user);
+});
+```
+If we do not specify any condition inside __findOne({})__ method then it will return any random document from the database (usually the firstOne) . 
+
+## find By Id And Delete Method On User Model:
+We can use find by id method to find a user by id and delete method to delete a user
+Refer the Official Documentation : https://mongoosejs.com/docs/api/model.html#Model.findByIdAndDelete()
+```javascript
+app.delete("/user", async (req, res) => {
+  const userId = req.body.id;
+  try {
+    const user = await User.findByIdAndDelete(userId);
+    if (!user) {
+      res.status(404).send("User Not Found:");
+    } else {
+      res.send("user Deleted Successfully");
+    }
+  } catch (err) {
+    res.status(400).send("User Not Found");
+  }
+}
+)
+```
+So Here we have used findByIdAndDelete method on our User Model to delete a user.
+In findByIdAndDelete we can either directly pass the id that we want to delete or we can specify 
+the __({ _id: userId })__ like this  
+
+## Updating an user using Patch HTTP method :
+We can update a user data by using findByIdAndUpdate method on the userId then we can pass the data which we want to update and it will
+update the user data with the new data that we have passed.
+We are also passing the userId which we want to update but internally mongo DB does not update anything which is not present in Schema.
+
+```javascript
+app.patch("/user", async (req, res) => {
+  const userId = req.body.userId;
+  const data = req.body;
+  try {
+    await User.findByIdAndUpdate(userId, data);
+    res.send("User Updated Successfully");
+  } catch (err) {
+    res.status(400).send("Something went wrong");
+  }
+});
+```
+Any other data which is Apart from Schema will not be updated and will be ignored by API's.
+
+We can also pass a third option into "findByIAndUpdate" which will return the document before or after the uddate based on 
+the option we provide into it. If we do not pass any option then by default it logs the first document that was before update.
+```javascript
+app.patch("/user", async (req, res) => {
+  const userId = req.body.userId;
+  const data = req.body;
+  try {
+    await User.findByIdAndUpdate(userId, data,{returnDocument:"before"});
+    res.send("User Updated Successfully");
+  } catch (err) {
+    res.status(400).send("Something went wrong");
+  }
+});
+```
+Read More About it At : https://mongoosejs.com/docs/api/model.html#Model.findByIdAndUpdate()
