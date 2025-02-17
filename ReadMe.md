@@ -1694,3 +1694,14 @@ So here we are creating a sign In API so here we will extract our email and pass
 if the email exists in our database or not then if the user exists then we will check if the password is valid or not and if all the things are valid then we will send the response Login Successful OR We will send the error message for that particular Error.
 
 ##Pull request
+
+## Authentication JWT & Cookies
+ When user makes a API call to server that is he want's to communicate with server then he creates a connection and that connection uses the TCP/IP protocol. Then server will send back the data and connection will be closed, Similarly when we hit an API call on the server then 
+ server will respond with the data and connection will close.
+
+ So every time the API call is made the server validates that response and sends back the data and connection is closed.
+ So Every time we make an API call the user needs to be validated whether the request is coming from Authorized source or Not.
+ So for that User Needs to be Logged In.
+
+ So When a user makes a logIn Request and the server verifies the Email and Password and while sending the response back gives
+  a Authentication Token (JWT Token) to user and now the users browser will Store this JWT, and everytime the user makes an API call for any other Request the JWT will also be sent along with the Request and server verifies that token then 
