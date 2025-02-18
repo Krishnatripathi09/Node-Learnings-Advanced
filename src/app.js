@@ -5,8 +5,11 @@ const app = express();
 const User = require("./models/user");
 const { validateSignUpData } = require("./middlewares/utils/validation");
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
 
 app.use(express.json());
+app.use(cookieParser());
+
 app.post("/signup", async (req, res) => {
   try {
     //Validattion Of Data
@@ -41,6 +44,7 @@ app.post("/signin", async (req, res) => {
     }
     const isPasswordValid = await bcrypt.compare(password, user.password); // If user exists then checking if the input password is similar to stored password
     if (isPasswordValid) {
+      res.cookie("token", "11132456uhgfdsdfgaxcwetuijhbvc23456789bvc");
       res.send("Login Successfull");
     } else {
       throw new Error("Invalid Password Bhau! ");
@@ -49,7 +53,13 @@ app.post("/signin", async (req, res) => {
     res.status(400).send("Error: " + err.message);
   }
 });
-Console.log("Get YOLO")
+
+app.get("/profile", async (req, res) => {
+  const cookie = req.cookies;
+  console.log(cookie);
+  res.send("Got the Cookie");
+});
+
 //Feed API to get all the data from the DataBase:
 app.get("/feed", async (req, res) => {
   try {

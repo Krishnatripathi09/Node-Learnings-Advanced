@@ -417,7 +417,7 @@ Also __/test/a(bc)+d__ we can make our path to accept random values (here bc in 
 We can also use regex in our api path to make it more dynamic for eg: if we have 
 a path __/a/__ so here if i go to path /a it will work and if we go to path __/b/__ it will not work.
 We can also use the other REGEX in our path like __/a[0-9]__ then it will work for path __/a1/__ and __/a2/__ but it will not work
-for path __/a/__ and __/b/__ as we have used regex in our path to accept only the numbers in our path after (a).
+for path __/a/__ and __/b/__ as we have used regex in our path to accept numbers in our path after (a).
 
 ## Query Params :
 We can read the query params in our api by using __req.query__ on our request for eg: if we have a path _/user_ then we can  console.log(res.query) it and then in postman we can add some query params which will be printed in our Console.
@@ -747,6 +747,10 @@ So that's why we should always keep our error Handler function in the End.
 
 ## Connecting to DataBase using Mongoose
 REFER to Document : __https://mongoosejs.com/docs/index.html__
+
+For mongoDB showing __ERROR__:( Error Occured ===> MongooseServerSelectionError: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/)
+
+TO Resolve this go to the Cluster and select the option **ADD IP Address** It will Automaticallly whitelist your IP.
 
 To connect to DataBase using mongoose we have to first install mongoose in our project using __npm i mongoose__.
 We have created a folder config inside that we have our database file in which we will write code to connect to database.
@@ -1703,5 +1707,44 @@ if the email exists in our database or not then if the user exists then we will 
  So Every time we make an API call the user needs to be validated whether the request is coming from Authorized source or Not.
  So for that User Needs to be Logged In.
 
- So When a user makes a logIn Request and the server verifies the Email and Password and while sending the response back gives
-  a Authentication Token (JWT Token) to user and now the users browser will Store this JWT, and everytime the user makes an API call for any other Request the JWT will also be sent along with the Request and server verifies that token then 
+ So When a user makes a logIn Request he sends his Email and Password and the server verifies the Email and Password and it will generate a JTW Token and Wrap that JWT Token inside the cookie and while sending the response back It also sends the cookie having (JWT Token) to user and now the users browser will Store this JWT, and everytime the user makes an API call for any other Request the JWT will also be sent along with the Request and server verifies that cookie(token) then responds with requested Information.
+ We can also send the Expiry of this JWT token along with Response.
+ And once the cookie is expired and we still make a API call the verification will fail and we will be redirected to Login Page.
+
+ So Whenever we are sending a response __Expresss__  provides a very Good way to send the response using a cookie.
+ __https://expressjs.com/en/5x/api.html#res.cookie__
+
+ We can send the cookie when a user Log's In using __res.cookie__. 
+ In our SignIn API we have set.
+ for eg:
+ ```javascript
+ if (isPasswordValid) {
+      res.cookie("token", "11132456uhgfdsdfgaxcwetuijhbvc23456789bvc");
+      res.send("Login Successfull");
+    } else {
+      throw new Error("Invalid Password Bhau! ");
+    }
+```
+Here we are sending the JWT token inside the cookie using __res.cookie__ method in express JS.
+
+And to get the cookie from the request when we try to access someother API Data we can use __req.cookies__ method.
+Read About it More Here: __https://expressjs.com/en/5x/api.html#req.cookies__
+for eg:
+```javascript
+app.get("/profile", async (req, res) => {
+  const cookie = req.cookies;
+  console.log(cookie);
+  res.send("Got the Cookie");
+});
+```
+So here we are getting the cookie from request body but when we log this It will show _Undefined_ as we cannot Read the cookie directly 
+To do that we will need a __npm package__ _cookie parser_.
+Similary like when we were reading the __JSON__ data we used a middleware __express.json()__ similarly we need a middleware to Read cookies
+as well.
+So we need to install _cookie-parser_ using __npm i cookie-parser__.
+After installing it we need to just import it and use it as we have used our Json middleware.
+```javascript
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+```
+So when we hit the Profile Route from postman it will log the cookie in our console.
