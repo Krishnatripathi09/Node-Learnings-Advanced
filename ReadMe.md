@@ -1747,4 +1747,96 @@ After installing it we need to just import it and use it as we have used our Jso
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 ```
-So when we hit the Profile Route from postman it will log the cookie in our console.
+So when we hit the Profile Route from postman it will fetch the cookie from request Header and will log the cookie in our Console.
+
+__What is Jwt Token ?__
+JSON Web Token (JWT) is an open standard (RFC 7519) that defines a compact and self-contained way for securely transmitting information between parties as a JSON object. 
+
+JWT token is divided into 3 parts Header, Payload and Signature
+1. **Header**: It contains the algorithm used to sign the token. For example, HS256
+2. **Payload** : It contains the data that is hidden Inside the token.
+3. **Signature**: It is used to check whether this Token is valid or Not.
+
+To create this JWT token we will be using another __NPM__ package known as _jsonwebtoken_
+We will install it using __npm i jsonwebtoken__
+
+After installing it we will require it in our __app.js__. Read it more about it's usage (https://www.npmjs.com/package/jsonwebtoken)
+we will require it in our __app.js__ 
+
+app.post("/signin", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email: email }); ///checking if user Email Exists in DataBase or Not using User Model.
+    if (!user) {
+      throw new Error("User Not Found With This Email:");
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password); // If user exists then checking if the input password is similar to stored password
+  ```javascript
+    if (isPasswordValid) {
+      //Create a Jwt Token
+
+      const token = await jwt.sign({ _id: user._id }, "Web@Secret789Token"); // Creating the JWT token 
+      res.cookie("token", token); // sending The token in cookie 
+
+      res.send("Login Successfull");
+    } else {
+      throw new Error("Invalid Password Bhau! ");
+    }
+  } catch (err) {
+    res.status(400).send("Error: " + err.message);
+  }
+  ```
+});
+
+So after importing it we will sign our jwt token using __jwt.sign__ and inside that we can hide some data so here we will hide the user Id
+So here the _id is the same id that is stored in our DataBase. And then we will pass a secret key into our token which only the server
+will know and will be used to verify the token. So we have passed the secret key and data inside the token.
+
+And now we will send this token back to the user using __res.cookie__ method
+```javascript
+res.cookie("token", token,) 
+res.send("LogIn Successful")
+```
+And once we set the cookie we can send the response back and the cookie will also sent along with the response.
+So now when we hit the login route from postman it will send the token back to the user.
+
+Now once we have send the cookie successfully we can use that cookie in other methods to verify it.
+So to verify our token in our _/profile_ Route we will extract the token from our cookie
+```javascript
+app.get("/profile", async (req, res) => {
+  const cookies = req.cookies;
+  const { token } = cookies;
+
+  
+  res.send("Got the Cookie");
+});
+```
+So here we are extracting the token from the cookie and storing it in the token variable.
+then we will use the method given by __jsonwebtoken__ package which is _jwt.verify_ to verify our token 
+```javascript
+app.get("/profile", async (req, res) => {
+  const cookies = req.cookies;
+  const { token } = cookies;
+
+  const decodedMsg = await jwt.verify(token, "Web@Secret789Token");
+  console.log(decodedMsg);
+
+  res.send("Got the Cookie");
+});
+``` 
+So here we have verified our Token using __jwt.verify(token,secretKey)__ method.
+
+So next we will extract the id from our decoded message and we will get the info about logged In User.
+```javascript
+app.get("/profile", async (req, res) => {
+  const cookies = req.cookies;
+  const { token } = cookies;
+
+  const decodedMsg = await jwt.verify(token, "Web@Secret789Token");
+  const { _id } = decodedMsg;
+  console.log("Logged In User is ====> ",_id);
+
+  res.send("Got the Cookie");
+});
+```
+After extracting the id from the msg we have logged the user in Console.
