@@ -1839,4 +1839,26 @@ app.get("/profile", async (req, res) => {
   res.send("Got the Cookie");
 });
 ```
-After extracting the id from the msg we have logged the user in Console.
+After extracting the id from the msg we have logged the user in Console. Next we can find the user with that id on our User Model and we can return the user details.
+```javascript  
+const user = await User.findById(_id)
+res.send(user)
+```
+We need to also add validations for our cookies if the token exists or not and whether the correct user exists with that id:
+```javascript
+ const cookies = req.cookies;
+    const { token } = cookies;
+    if (!token) {
+      throw new Error("Invalid Token");
+    }
+
+    const decodedMsg = await jwt.verify(token, "Web@Secret789Token");
+    const { _id } = decodedMsg;
+    const user = await User.findById(_id);
+
+    if (!user) {
+      throw new Error("User Not Found");
+    }
+
+    res.send(user);
+    ```

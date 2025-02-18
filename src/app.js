@@ -19,7 +19,6 @@ app.post("/signup", async (req, res) => {
 
     //Encrypt the Password
     const passwordHash = await bcrypt.hash(password, 10);
-    console.log(passwordHash);
 
     //Creating the new Instance of User Model
     const user = new User({
@@ -59,14 +58,25 @@ app.post("/signin", async (req, res) => {
 });
 
 app.get("/profile", async (req, res) => {
-  const cookies = req.cookies;
-  const { token } = cookies;
+  try {
+    const cookies = req.cookies;
+    const { token } = cookies;
+    if (!token) {
+      throw new Error("Invalid Token");
+    }
 
-  const decodedMsg = await jwt.verify(token, "Web@Secret789Token");
-  const { _id } = decodedMsg;
-  console.log("Logged In User is ====> ", _id);
+    const decodedMsg = await jwt.verify(token, "Web@Secret789Token");
+    const { _id } = decodedMsg;
+    const user = await User.findById(_id);
 
-  res.send("Got the Cookie");
+    if (!user) {
+      throw new Error("User Not Found");
+    }
+
+    res.send(user);
+  } catch (err) {
+    res.status(400).send("Error :", +err.message);
+  }
 });
 
 //Feed API to get all the data from the DataBase:
