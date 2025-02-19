@@ -1904,5 +1904,25 @@ Here we have extracted the token from our cookies in our request then we have ha
 exist then throw an error else verify that token using jwt.verify and our secret key and then extract the {_id} from that token then 
 find the user with that id on our User Model if user is not found then throw an error and if found then pass the request to next handler.
 
-Now we can import and use this middleware function in any request handler.
+Now we can import and use this middleware function in any request handler like profile, feed etc.
+for eg:
+```javascript
+app.get("/profile", userAuth, async (req, res) => {
+  //Profile Logic Here
+})
+```
+Here we have used __userAuth__ middle before the request proceeds with /profile route So It will not provide the profile Data
+if user is not verified.
 
+## Implementing the /sendConnectionRequest Logic.
+```javascript
+app.post("/sendConnectionRequest", userAuth, async (req, res) => {
+  const user = req.user;
+
+  console.log("Sending Connection Request");
+  res.send(user.firstName + " sent the Connection Request");
+});
+```
+So here we have implemented the dummy send connection Request Logic and we have used our __userAuth__ middleware before the request proceeds
+with sending the connection Request.So if the user is Authenticated then we can get our user from request  and then 
+send the request with the firstName of that user.
