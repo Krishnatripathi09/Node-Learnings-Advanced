@@ -1926,3 +1926,124 @@ app.post("/sendConnectionRequest", userAuth, async (req, res) => {
 So here we have implemented the dummy send connection Request Logic and we have used our __userAuth__ middleware before the request proceeds
 with sending the connection Request.So if the user is Authenticated then we can get our user from request  and then 
 send the request with the firstName of that user.
+
+We can also set our token to expire in sometime : Read More about it Here "https://www.npmjs.com/package/jsonwebtoken"
+```javascript
+ //Create a Jwt Token
+      const token = await jwt.sign({ _id: user._id }, "SecrtetKey", {
+        expiresIn: "0d",
+
+      });
+```
+When signing our JWT token using jwt.sign() with jsonwebtoken package, We can pass various options inside the third argument.
+```json
+expiresIn: "2h", // Token expires in 2 hours
+  notBefore: "10s", // Token starts working after 10 seconds :: Token cannot be used before 10 seconds.
+  algorithm: "HS256", // Hashing algorithm
+  audience: "cyfhr.com", // Intended audience :: That is it is meant for this website
+  issuer: "cyfhr-auth", // Token issuer ::Token was issued by cyfhr-auth.
+  subject: "user-auth", // Subject of the token :: Defines the purpose (sub) of the token.
+  jwtid: "unique123", // Unique identifier for the token :: Adds a unique identifier (jti) to prevent token reuse
+```
+
+## Cookie Expiry 
+We can also pass various options into our cookie as well like expiry or httpOnly etc.
+Here we set our cookie to expire in 8 hrs
+Read it more about it here : "https://expressjs.com/en/api.html#res.cookie"
+```javascript
+res.cookie('name', 'tobi', { domain: '.example.com', path: '/admin', secure: true })
+res.cookie('rememberme', '1', { expires: new Date(Date.now() + 900000), httpOnly: true })
+```
+
+## Mongoose Schema Methods:
+As a Best Practice followed we should create our Jwt from methods on our userSchema
+```javascript
+userSchema.methods.getJWT = async function () {
+  const user = this;
+  const token = await jwt.sign({ _id: this._id }, "Web@Secret789Token", {
+    expiresIn: "7d",
+  });
+};
+```
+Here we are defining a method inside our Mongoose userSchema that will generate a JWT (JSON Web Token) for a user
+
+userSchema.methods → Allows us to add custom methods to a Mongoose schema.
+getJWT → The name of the custom method.
+async function () {...} → The method is asynchronous, meaning it will return a Promise.
+this._id instead of user._id because this refers to the specific user document in our schema
+
+Also here we can-not use arrow functions as this keyword only works with normal functions and not arrow functions.
+
+**Why use methods?**
+This makes it easy to call user.getJWT() from any user document to generate a token for that user
+Now we can use this getJWT() function on the user 
+```javascript
+app.post("/signin", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email: email }); 
+    if (!user) {
+      throw new Error("User Not Found With This Email:");
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password); 
+
+    if (isPasswordValid) {
+      
+      const token = await user.getJWT();  //Signing the jwt using our JWT function as we can call the getJWT function on user who is logging In
+
+      res.cookie("token", token, {
+        expires: new Date(Date.now() + 8 * 3600000),
+      });
+      res.send("Login Successfull");
+    } else {
+      throw new Error("Invalid Password Bhau! ");
+    }
+  } catch (err) {
+    res.status(400).send("Error: " + err.message);
+  }
+});
+```
+
+So here we are signing our JWT token for logged In user using our getJWT() function that we have created on our userSchema method.
+By doing this we make are code more Readable,Maintainable by offloading our JWT generation process to userSchema method.
+
+Similarly we can also offload the password verification to userSchema method.
+```javascript
+userSchema.methods.verifyPwd = async function (passwordInputByUser) {
+  const user = this;
+  const passWordHash = user.password;
+
+  const isValidPassword = await bcrypt.compare(
+    passwordInputByUser,
+    passWordHash
+  );
+  return isValidPassword;
+};
+```
+So here we have created a function verifyPwd on our userSchema and then we are comparing user Input password using bcrypt.compare
+and then if the password is valid then return the password and next we will use our verifyPwd() function for verifying password
+```javascript
+app.post("/signin", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email: email }); 
+    if (!user) {
+      throw new Error("User Not Found With This Email:");
+    }
+    const isPasswordValid = await user.verifyPwd(password); // If user exists then calling our verifypwd function and verifying the password
+
+    if (isPasswordValid) {
+      const token = await user.getJWT(); 
+
+      res.cookie("token", token, {
+        expires: new Date(Date.now() + 8 * 3600000),
+      });
+      res.send("Login Successfull");
+    } else {
+      throw new Error("Invalid Password Bhau! ");
+    }
+  } catch (err) {
+    res.status(400).send("Error: " + err.message);
+  }
+});
+```
