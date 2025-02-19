@@ -7,6 +7,7 @@ const { validateSignUpData } = require("./middlewares/utils/validation");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const { userAuth } = require("./middlewares/auth");
 
 app.use(express.json());
 app.use(cookieParser());
@@ -45,7 +46,6 @@ app.post("/signin", async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password); // If user exists then checking if the input password is similar to stored password
     if (isPasswordValid) {
       //Create a Jwt Token
-
       const token = await jwt.sign({ _id: user._id }, "Web@Secret789Token");
       res.cookie("token", token);
       res.send("Login Successfull");
@@ -57,7 +57,7 @@ app.post("/signin", async (req, res) => {
   }
 });
 
-app.get("/profile", async (req, res) => {
+app.get("/profile", userAuth, async (req, res) => {
   try {
     const cookies = req.cookies;
     const { token } = cookies;

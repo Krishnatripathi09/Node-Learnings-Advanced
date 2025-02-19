@@ -497,7 +497,7 @@ app.use("/user",()=>{
 ```
 Here as we have added multiple Route Hanlder functions inside a single Route but when we will hit the "/user" path then the response of just 
 1st Route handler will be returned to client it will not go to the next Route Handlers as we do not have passed the parameter __next__ inside our function.
-So to make our Route handler to go for the next function if we do not provide any response in the first function we have to sepcify one more 
+So to make our Route handler to go for the next function if we do not provide any response in the first function we have to specify one more 
 parameter __next__ inside our function and then we have to use that parameter inside our function 
 
 for eg:
@@ -540,7 +540,7 @@ app.use("/user",(req,res,next)=>{
 So In the Above case it will throw an Error.
 But If we do not use __next()__ and do not provide any response then the request from client will go in infinite loop.
 
-We can define as many Route Handlers inside our route as many we want we can also wrap our route handlers inside an array
+We can define as many Route Handlers inside our route as many we want we can also wrap our route handlers inside an array [].
 for eg:
  ```javascript
 app.use("/user",[(req,res,next)=>{
@@ -674,7 +674,7 @@ app.use("/admin", adminAuth);
 ```
 Here we have used our "adminAuth" on "/admin" route and it will work on all the requests coming to /admin Route.
 
-Instead of using middleware like above we can also use it like below if we just single htpp methods.
+Instead of using middleware like above we can also use it like below if we just have single http methods.
 But if we have multiple http methods for that particular Route then we can define it separately as above for that particular Route and it will work on all Requests coming to that Route.
 ```javascript
 app.get("/admin/getAllData",adminAuth, (req, res) => {
@@ -1861,4 +1861,48 @@ We need to also add validations for our cookies if the token exists or not and w
     }
 
     res.send(user);
-    ```
+  ```
+## Creating the User Auth MiddleWare :
+//Reading the token from req Cookies
+//Validate the Token
+//Find The User
+
+we will Implement above things in our UserAuth middleware.
+```javascript
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
+
+const userAuth = async (req, res, next) => {
+  try {
+    //read the token from req cookies
+
+    const { token } = req.cookies;
+    if (!token) {
+      throw new Error("Token is not valid!!!");
+    }
+
+    //validate the token
+    const decodedMsg = await jwt.verify(token, "Web@Secret789Token");
+    const { _id } = decodedMsg;
+
+    //Find the User
+    const user = await User.findById(_id);
+    if (!user) {
+      throw new Error("User Not Found");
+    }
+    next();
+  } catch (err) {
+    res.status(404).send("ERROR" + err.message);
+  }
+};
+
+module.exports = {
+  userAuth,
+};
+```
+Here we have extracted the token from our cookies in our request then we have have checked if token exists in cookies or not if it does not 
+exist then throw an error else verify that token using jwt.verify and our secret key and then extract the {_id} from that token then 
+find the user with that id on our User Model if user is not found then throw an error and if found then pass the request to next handler.
+
+Now we can import and use this middleware function in any request handler.
+
