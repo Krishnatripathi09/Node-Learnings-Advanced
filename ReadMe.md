@@ -420,6 +420,10 @@ We can also use the other REGEX in our path like __/a[0-9]__ then it will work f
 for path __/a/__ and __/b/__ as we have used regex in our path to accept numbers in our path after (a).
 
 ## Query Params :
+Query Parameters are key-value pairs sent in the URL after a (?) question mark  and are use to filter or modify the request.
+for eg: __/search?query=javascript&sort=asc__
+Unlike Route Parameters Query parameters are Optional and do not define the URL structure.
+
 We can read the query params in our api by using __req.query__ on our request for eg: if we have a path _/user_ then we can  console.log(res.query) it and then in postman we can add some query params which will be printed in our Console.
 So When passing query parameters in a URL, We use a question mark (?) to separate the base URL from the query parameters.
 
@@ -442,7 +446,12 @@ http://localhost:3000/user?userid=101&name=John
 So here { userid: '101', name: 'John' } will be printed to Dev Console
 If we want only values to be printed then we can use __req.query.name__ and it will print only "John" to the console. 
 
-##  Dynamic Routes:
+##  Route Parameters:
+Route parameters are placedholders in the URL prefixed with a colon(:),which allows clients to request specific data .
+for eg: /profile/:profileId, profileId is a route parameter and we can access the value of the  parameter 
+using __(req.params.profileId)__
+so here if a user visits __/profile/123__ here 123 is the profileId that can be accessed using above route parameter.
+
 We can also add Dynamic routes by using "/abc/:user" so here (:) giving colon we can add dynamic path and we can read it by using req.params so here userId is the dynamic path which we are accessing. for eg 
 ```javascript
 (app.get("/users/:userId", (req, res) => 
@@ -2021,7 +2030,8 @@ userSchema.methods.verifyPwd = async function (passwordInputByUser) {
 };
 ```
 So here we have created a function verifyPwd on our userSchema and then we are comparing user Input password using bcrypt.compare
-and then if the password is valid then return the password and next we will use our verifyPwd() function for verifying password
+and then if the password is valid then return the password and next we will use our verifyPwd() function for verifying password when a user 
+Logs-In
 ```javascript
 app.post("/signin", async (req, res) => {
   try {

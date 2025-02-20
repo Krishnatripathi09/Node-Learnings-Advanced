@@ -70,8 +70,6 @@ app.get("/profile", userAuth, async (req, res) => {
 
 app.post("/sendConnectionRequest", userAuth, async (req, res) => {
   const user = req.user;
-
-  console.log("Sending Connection Request");
   res.send(user.firstName + " sent the Connection Request");
 });
 
@@ -83,5 +81,5 @@ connectDB()
     });
   })
   .catch((err) => {
-    console.log("Error Occured ===>", err);
+    res.send("Error Occured ===>", err);
   });
