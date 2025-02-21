@@ -970,6 +970,19 @@ error that might occur while saving the data to our database.
   ```
 
 ## Diff in JS Object and JSON 
+| Feature           | JavaScript Object | JSON (JavaScript Object Notation) |
+|------------------|------------------|---------------------------------|
+| **Definition**    | A key-value pair structure used in JavaScript code. | A lightweight data-interchange format. |
+| **Data Type**     | Can contain functions, symbols, and other complex types. | Only supports primitive data types like strings, numbers ,booleans, arrays, and objects. |
+| **Syntax**        | Uses unquoted keys. | Requires keys to be in double quotes. |
+| **Example**       | `{ name: "John", age: 30 }` | `{ "name": "John", "age": 30 }` |
+| **Usage**         | Used in JavaScript programming as variables or objects. | Used for data transmission between a server and a client. |
+| **Parsing**       | Directly usable in JavaScript. | Needs to be parsed with `JSON.parse()` before using in JavaScript. |
+| **Stringification** | Not needed, since it’s already an object. | Can be converted to a string using `JSON.stringify()`. |
+| **Comments**      | Can include comments. | Does not support comments. |
+
+
+
 
 ## Creating an API to send the user Data instead of Hardcoding:
 So the above data that we have created for user should also be coming from User.
