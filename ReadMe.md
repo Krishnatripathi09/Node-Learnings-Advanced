@@ -1547,11 +1547,11 @@ photoUrl: {
   then it will throw an error. So we can add validators on every field like this.
 
   ## Encrypting our Password
-  Now we are storing our App in Plain Text and anyone who has access to DB can view our user passwords directly.
+  Now we are storing our Password in Plain Text and anyone who has access to DB can view our user passwords directly.
   So to prevent this we can use a library called __bcrypt__ from __npm__.
 
-First we will create some helper functions to perform the check on the data which is coming into the Database when a user signsUp so for this we will create a utils folder and inside that we will create a file named __validation.js__
-and inside the file we can cehck validation for the comming through our signUp API.
+First we will create some helper functions to perform the check on the data which is coming into the Database when a user signs-Up so for this we will create a utils folder and inside that we will create a file named __validation.js__
+and inside the file we can check validation for the comming data through our signUp API.
 ```javascript
 const validateSignUpData = () => {
   const { firstName, lastName, email, password } = req.body;
