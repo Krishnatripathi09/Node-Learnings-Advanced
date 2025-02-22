@@ -1022,13 +1022,13 @@ app.post("/signup", async (req, res) => {
   //   password: "krishna123",
   // };
 
-  //   const user = new User(userObj);
-  //   try {
-  //     await user.save();
-  //     res.send("Data Saved SucessFully");
-  //   } catch (err) {
-  //     res.status(400).send("Error Sending the data:" + err.message);
-  //   }
+    const user = new User(userObj);
+    try {
+      await user.save();
+      res.send("Data Saved SucessFully");
+    } catch (err) {
+      res.status(400).send("Error Sending the data:" + err.message);
+    }
 });
 ```
 Here req Body does not contain only data but other things as well so the incoming message is very big which we can see in our 
@@ -1140,7 +1140,7 @@ app.get("/user", async (req, res) => {
 ```
 when a user is not found in DB then we are sending that user with this email is Not Found:
 
-## find One Method On User Model:
+## find-One Method On User Model:
 We can use find one method to find a user if a user is registered multiple times with same email:
 It returns the Oldest document with that particular value that we have passed inside it. In our Case we are passing _email_.
 ```javascript
@@ -1729,7 +1729,7 @@ if the email exists in our database or not then if the user exists then we will 
  So Every time we make an API call the user needs to be validated whether the request is coming from Authorized source or Not.
  So for that User Needs to be Logged In.
 
- So When a user makes a logIn Request he sends his Email and Password and the server verifies the Email and Password and it will generate a JTW Token and Wrap that JWT Token inside the cookie and while sending the response back It also sends the cookie having (JWT Token) to user and now the users browser will Store this JWT, and everytime the user makes an API call for any other Request the JWT will also be sent along with the Request and server verifies that cookie(token) then responds with requested Information.
+ So When a user makes a logIn Request he sends his Email and Password and the server verifies the Email and Password and it will generate a JWT Token and Wrap that JWT Token inside the cookie and while sending the response back It also sends the cookie having (JWT Token) to user and now the users browser will Store this JWT, and everytime the user makes an API call for any other Request the JWT will also be sent along with the Request and server verifies that cookie(token) then responds with requested Information.
  We can also send the Expiry of this JWT token along with Response.
  And once the cookie is expired and we still make a API call the verification will fail and we will be redirected to Login Page.
 
@@ -1775,7 +1775,7 @@ __What is Jwt Token ?__
 JSON Web Token (JWT) is an open standard (RFC 7519) that defines a compact and self-contained way for securely transmitting information between parties as a JSON object. 
 
 JWT token is divided into 3 parts Header, Payload and Signature
-1. **Header**: It contains the algorithm used to sign the token. For example, HS256
+1. **Header**: It contains the algorithm used to sign the token. For example, HS256.
 2. **Payload** : It contains the data that is hidden Inside the token.
 3. **Signature**: It is used to check whether this Token is valid or Not.
 
@@ -1834,6 +1834,7 @@ app.get("/profile", async (req, res) => {
 });
 ```
 So here we are extracting the token from the cookie and storing it in the token variable.
+but we can-not read our token from the cookie directly so for that we have to install a middleware named __cookie-parser__
 then we will use the method given by __jsonwebtoken__ package which is _jwt.verify_ to verify our token 
 ```javascript
 app.get("/profile", async (req, res) => {
