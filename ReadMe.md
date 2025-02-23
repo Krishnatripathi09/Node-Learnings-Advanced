@@ -2071,3 +2071,100 @@ app.post("/signin", async (req, res) => {
   }
 });
 ```
+
+## List Of API's For our APP
+API's Needed In our App:
+
+/Auth Router
+-POST /signup
+-POST /login
+-POST /logout
+
+profileRouter
+-GET/profile/view
+-PATCH/profile/edit
+-PATCH /profile/password
+
+Connection Request Router
+-POST /request/send/interested/:userId
+-POST /request/send/ignored/:userId
+-POST /request/review/accepted/:requestId
+-POST /request/review/rejected/:requestId
+
+User Router
+-GET /user/connections
+-GET /user/requests/received
+-GET /user/feed - gets the profile of other users on platform
+
+status: Ignore,Interested, Accepted,Rejected
+status: Ignore,Interested, Accepted,Rejected
+
+So we will creating above API's for in our APP.
+
+For Now we were writing all our API's in a single file which is __app.js__ but Now we are Going to use Express Router to create Our API's
+
+## Express Router :
+📌 What is Express Router?
+Express Router is a built-in feature in Express.js that allows us to organize our routes efficiently by grouping them into separate modules. It helps us keep our server files clean and makes our application modular and scalable.
+
+🔥 Why Use Express Router?
+- Organizes Routes – Instead of defining all routes in app.js, We can separate them into multiple route files.
+- Improves Readability – Cleaner and easier to manage large applications.
+- Supports Middleware – You can apply middleware to specific route groups.
+- Reusable & Modular – Easily export and import routes in different files.
+
+To create a Express Router we import express and then access the inbuilt Router Function  like below
+```javascript
+const express = require('express')
+
+const authRouter = express.Router()
+
+module.exports = authRouter
+```
+__express.Router()__ creates a new instance of a router in Express. This authRouter acts like a mini Express app that can handle routes separately.
+
+Now instead of creating our API's like __app.get()__ we will directly use it as ___authRouter.get()__ and it will work exactly like 
+the app.get and for other http methods as well
+
+```javascript
+authRouter.post("/signup", async (req, res) => {
+  try {
+    validateSignUpData(req);
+    const { firstName, lastName, email, password } = req.body;
+
+    //Encrypt the Password
+    //Creating the new Instance of User Model
+
+    const passwordHash = await bcypt.hash(password, 10);
+
+    const user = new User({
+      firstName,
+      lastName,
+      email,
+      password: passwordHash,
+    });
+
+    await user.save();
+    res.status(201).send("Profile Created Successfully 😀. Please Log-In");
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});
+```
+So here we have created a file for our auth Routers(Sign-In/Sign-Up) and then we have passed the logic for our Sign-In and Sign-Up 
+here and we can remove the logic from our app.js as we no longer need it there after creating a separate folder for our auth and other
+Routes like profile and Requests
+
+Now after defining them in Separate Files we can Import them in our __app.js__ file and then we define our route using __app.use()__.
+```javascript
+const authRouter = require("./routes/auth");
+const profileRouter = require("./routes/profile");
+const requestRouter = require("./routes/request");
+
+app.use("/",authRouter)
+app.use("/",profileRouter)
+app.use("/",requestRouter)
+```
+So here we have imported our different routes created using express.Router and then we have defined them using __app.use()__.
+
+This is how we can separate our routes in different files and then import them in our main app.js

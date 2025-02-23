@@ -13,6 +13,7 @@ const userAuth = async (req, res, next) => {
     //validate the token
     const decodedMsg = await jwt.verify(token, "Web@Secret789Token");
     const { _id } = decodedMsg;
+
     //Find the User
     const user = await User.findById(_id);
     if (!user) {
