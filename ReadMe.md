@@ -1022,13 +1022,13 @@ app.post("/signup", async (req, res) => {
   //   password: "krishna123",
   // };
 
-    const user = new User(userObj);
-    try {
-      await user.save();
-      res.send("Data Saved SucessFully");
-    } catch (err) {
-      res.status(400).send("Error Sending the data:" + err.message);
-    }
+    // const user = new User(userObj);
+    // try {
+    //   await user.save();
+    //   res.send("Data Saved SucessFully");
+    // } catch (err) {
+    //   res.status(400).send("Error Sending the data:" + err.message);
+    // }
 });
 ```
 Here req Body does not contain only data but other things as well so the incoming message is very big which we can see in our 
