@@ -2153,7 +2153,7 @@ authRouter.post("/signup", async (req, res) => {
 ```
 So here we have created a file for our auth Routers(Sign-In/Sign-Up) and then we have passed the logic for our Sign-In and Sign-Up 
 here and we can remove the logic from our app.js as we no longer need it there after creating a separate folder for our auth and other
-Routes like profile and Requests
+Routes like profile and Requests.
 
 Now after defining them in Separate Files we can Import them in our __app.js__ file and then we define our route using __app.use()__.
 ```javascript
@@ -2166,5 +2166,36 @@ app.use("/",profileRouter)
 app.use("/",requestRouter)
 ```
 So here we have imported our different routes created using express.Router and then we have defined them using __app.use()__.
+This is how we can separate our routes in different files and then import them in our main app.js.
 
-This is how we can separate our routes in different files and then import them in our main app.js
+## Creating a Log-Out API
+In-side our auth Router we will create a API for Logging-OUT an User.
+To create the log-out API we have to just set our token to null and send the response to user 
+```javascript
+authRouter.post("/logout", (req, res) => {
+  res.clearCookie("token", null, {
+    expires: new Date(Date.now()),
+  });
+
+  res.send("Log-Out Successfull");
+});
+```
+Doing this will set the token null and we have successfully created the Log-Out API.
+we can use the __res.clearCookie__ method or we can also use __res.cookie__ method to set our token null.
+```javascript
+res.cookie("token",null,{
+  expires: new Date(Dat.now())
+})
+```
+In Both the ways we can create a Log-Out API in our auth Router.
+
+we can also use chaining instead of writing __res__ everytime.
+for eg:
+```javascript
+res
+.clearCookie("token",null,{
+  expires:new Date(Date.now())
+})
+.send("Log-out Successfull")
+```
+This is how we can write the log-out API using Chaining.
