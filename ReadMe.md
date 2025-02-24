@@ -2198,4 +2198,56 @@ res
 })
 .send("Log-out Successfull")
 ```
-This is how we can write the log-out API using Chaining.
+This is also how we can write the log-out API using Chaining.
+
+## Creating the Patch API for our user Profile:
+Here we are creating a Patch API for our User Profile.
+```javascript
+profileRouter.patch("/profile/edit", userAuth, (req, res) => {
+  try {
+    if (!validateEditProfileData(req)) {
+      return res.status(400).send("Edit Not Allowed On This Field");
+    }
+    const loggedInUser = req.user;
+    console.log(loggedInUser);
+  } catch (err) {
+    console.log("Error :" + err);
+  }
+});
+
+```
+so here we have created our __/profile/edit__ API and inside which we have passed our **validateEditProfileData** function which we
+have defined in our __validation__ file which checks whether the Body includes the fields which are allowed to edit or Not.
+and then if it is allowed to edit then we are getting the loggedInUser from the req.user which we have attached in our __userAuth__
+middleware file define in __auth.js__ file.
+
+
+```javascript
+ const validateEditProfileData = (req, res) => {
+  const allowedEditFields = [
+    "firstName",
+    "lastName",
+    "age",
+    "gender",
+    "password",
+    "phototUrl",
+    "about",
+    "skills",
+  ];
+  const isEditAllowed = Object.keys(req.body).every((field) =>
+    allowedEditFields.includes(field)
+  );
+
+  return isEditAllowed;
+};
+```
+Here we have defined our **validateEditProfileData** function which checks if the user is trying to
+edit any of the fields which are allowed to be edited. If the validateEditProfileData function does not include the field the user is
+trying to edit then it will throw an Error.
+```javascript
+ Object.keys(req.body).forEach((key) => (loggedInUser[key] = req.body[key]));
+await loggedInUser.save();
+```
+So here we are going over every field that we are receiving in our req body and then we are updating that in our loggeInUser Body
+and then we are saving the loggedInUser in the database using the **save** method of the 
+**mongoose** model.
