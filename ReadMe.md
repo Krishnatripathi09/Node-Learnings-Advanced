@@ -2413,6 +2413,7 @@ const existingConnectionRequest = await ConnectionRequest.findOne({
 })
 ```
 So here we are checking on our User Model whether connection Request Already Exists or Not.
+
 And we also have to add the Check for whether the other user has sent the connection Request already to this user or Not.
 ```javascript
 const existingConnectionRequest = await ConnectionRequest.finOne({
@@ -2423,3 +2424,60 @@ const existingConnectionRequest = await ConnectionRequest.finOne({
 ```
 So here we are a checking whether fromUserId and toUserId are same using __$or__ method available on mongoose and then we are checking whether the fromUserId is toUserId or toUserId is from user Id.
 So here we are checking whether the connection Request Already Exists and was sent by Logged-In User or sent by the other User.
+
+[$or query $and query in mongoose] - [https://www.mongodb.com/docs/manual/reference/operator/query-logical/]
+
+We can add one more check for if the person we are trying to send connection request exists in our DataBase or Not:
+```javascript
+const toUser = await User.findById(toUserId)
+if(!toUser){
+  return res.status(404).send("User Not Found 😕")
+}
+```
+
+There is one more case that we can add is whether the user is trying to send the Connection Request to himself.
+We can add this check using __pre__ middleware provided by mongoose: 
+[Pre Method][https://mongoosejs.com/docs/middleware.html#pre]
+
+This middleware works before we save the data to DataBase as we are calling it pre - saving And we can define it inside our Connection-Request 
+Schema
+```javascript
+connectionRequestSchema.pre("save",function (){
+  const connectionRequest = this;
+  //Check if the from User Id is same as To user Id:
+
+  if(connectionRequest.fromUserId.equals(connectionRequest.toUserId)){
+    throw new Error("You cannot send Connection Request to Yourselves !")
+  }
+})
+```
+
+## Creating Indexes on our Data-Base:
+Indexes in a database significantly improve the performance of queries by reducing the number of records the database needs to scan. Instead of scanning every document (a full collection scan), an index allows MongoDB to quickly locate relevant documents.
+
+When our Database grows in Size due to many number of Records Inserted into It, It will become slow overtime and to optimize it,
+we can create indexes on our DataBase to improve the performance of our queries. 
+
+When we write __unique__ as true for any field in our Schema file the Mongo-DB automatically creates index for that field.
+we can also write __index:true__ for the field we want to create index for:
+
+We can also create a compound index (multiple fields) on our connectionRequestSchema to make it more efficient.
+```javascript
+connectionRequestSchema.index({fromUserId:1,toUserId:1})
+```
+And this improves the performance of the query when someone tries to find a user using User Id.
+[Cerating Indexes on fields Mongoose DOC][https://mongoosejs.com/docs/api/schema.html#Schema.prototype.index()]
+[Read this arcticle about compond indexes] [https://www.mongodb.com/docs/manual/core/indexes/index-types/index-compound/]
+
+If you create an index on email:
+```javascript
+db.users.createIndex({ email: 1 });
+```
+MongoDB stores email addresses in a B-tree index (a sorted structure).
+When We search for "user@example.com", MongoDB quickly locates the document without scanning all records.
+The time complexity is O(log n), which is much faster than O(n).
+Result: Even with 1 million users, MongoDB finds the user almost instantly instead of scanning all records.
+
+✅ With an index, MongoDB searches the B-tree structure instead of scanning all documents.
+✅ Queries on indexed fields are much faster and more efficient.
+✅ Indexes are automatically updated when you insert, update, or delete documents.
