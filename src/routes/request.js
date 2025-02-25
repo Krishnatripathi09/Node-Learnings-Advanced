@@ -12,6 +12,14 @@ requestRouter.post(
       const toUserId = req.params.touserId;
       const status = req.params.status;
 
+      const allowedStatus = ["ignored", "interested"];
+
+      if (!allowedStatus.includes(status)) {
+        return res
+          .status(400)
+          .json({ message: "Invalid Status Type: " + status });
+      }
+
       const connectionRequest = new ConnectionRequest({
         fromUserId,
         toUserId,

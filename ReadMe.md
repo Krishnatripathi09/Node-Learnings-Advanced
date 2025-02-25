@@ -2361,3 +2361,45 @@ requestRouter.post(
 );
 ```
 And Once we hit the above post API path with Correct User Details the above connection Request will be sent and save in our connectionRequestSchema as we have called __.save()__ method on our connction Request Schema.
+
+We can also add validation on our sendConnectionRequest API to allow only the statua type as either "interested" or "rejected":
+for eg:
+
+requestRouter.post(
+  "/request/send/:status/:touserId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const fromUserId = req.user._id;
+      const toUserId = req.params.touserId;
+      const status = req.params.status;
+
+```javascript
+      const allowedStatus = ["ignored", "interested"];
+
+      if (!allowedStatus.includes(status)) {
+        return res
+          .status(400)
+          .json({ message: "Invalid Status Type: " + status });
+      }
+  ```
+
+      const connectionRequest = new ConnectionRequest({
+        fromUserId,
+        toUserId,
+        status,
+      });
+
+      const data = await connectionRequest.save();
+      res.json({
+        message: "Connection Request Sent Successfully",
+        data,
+      });
+    } catch (err) {
+      res.status(400).send("ERROR : " + err.message);
+    }
+  }
+);
+
+So here we are only allowing the status to be either interested or rejected as while sending the connection request only these 2 statuses should
+be allowed.If the user tries to send any other status then it should be rejected with 400 and status.
