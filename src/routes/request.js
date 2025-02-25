@@ -20,6 +20,23 @@ requestRouter.post(
           .json({ message: "Invalid Status Type: " + status });
       }
 
+      //If Connection Request Already Exists:
+      const existingConnectionRequest = await ConnectionRequest.findOne({
+        $or: [
+          { fromUserId, toUserId },
+          {
+            fromUserId: toUserId,
+            toUserId: fromUserId, //For Mutual Connection Request
+          },
+        ],
+      });
+
+      if (existingConnectionRequest) {
+        return res
+          .status(400)
+          .json({ message: "Connection Request Already Exists 😏" });
+      }
+
       const connectionRequest = new ConnectionRequest({
         fromUserId,
         toUserId,

@@ -2362,9 +2362,9 @@ requestRouter.post(
 ```
 And Once we hit the above post API path with Correct User Details the above connection Request will be sent and save in our connectionRequestSchema as we have called __.save()__ method on our connction Request Schema.
 
-We can also add validation on our sendConnectionRequest API to allow only the statua type as either "interested" or "rejected":
+We can also add validation on our sendConnectionRequest API to allow only the status type as either "interested" or "rejected":
 for eg:
-
+```javascript
 requestRouter.post(
   "/request/send/:status/:touserId",
   userAuth,
@@ -2374,7 +2374,6 @@ requestRouter.post(
       const toUserId = req.params.touserId;
       const status = req.params.status;
 
-```javascript
       const allowedStatus = ["ignored", "interested"];
 
       if (!allowedStatus.includes(status)) {
@@ -2382,7 +2381,7 @@ requestRouter.post(
           .status(400)
           .json({ message: "Invalid Status Type: " + status });
       }
-  ```
+
 
       const connectionRequest = new ConnectionRequest({
         fromUserId,
@@ -2400,6 +2399,27 @@ requestRouter.post(
     }
   }
 );
-
+```
 So here we are only allowing the status to be either interested or rejected as while sending the connection request only these 2 statuses should
 be allowed.If the user tries to send any other status then it should be rejected with 400 and status.
+
+And we also need to add other validations like if a user has sent connection Request to another user then he should not be able to send
+the connection Request Again to Same user.
+So for that we will add one more validation
+```javascript
+const existingConnectionRequest = await ConnectionRequest.findOne({
+  fromUserId,
+  toUserId
+})
+```
+So here we are checking on our User Model whether connection Request Already Exists or Not.
+And we also have to add the Check for whether the other user has sent the connection Request already to this user or Not.
+```javascript
+const existingConnectionRequest = await ConnectionRequest.finOne({
+  $or:[
+    {fromUserId,toUserId},{fromUserId:toUserId,toUserId:fromUserId }
+  ]
+})
+```
+So here we are a checking whether fromUserId and toUserId are same using __$or__ method available on mongoose and then we are checking whether the fromUserId is toUserId or toUserId is from user Id.
+So here we are checking whether the connection Request Already Exists and was sent by Logged-In User or sent by the other User.
