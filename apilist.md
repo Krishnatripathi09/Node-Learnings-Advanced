@@ -8,7 +8,7 @@ API's Needed In our App:
 profileRouter
 -GET/profile/view
 -PATCH/profile/edit
--PATCH /profile/password
+-PATCH /profile/password ----- Write the Logic By Your-selves
 
 Connection Request Router
 -POST /request/send/interested/:userId

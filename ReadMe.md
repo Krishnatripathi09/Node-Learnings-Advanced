@@ -2251,3 +2251,113 @@ await loggedInUser.save();
 So here we are going over every field that we are receiving in our req body and then we are updating that in our loggeInUser Body
 and then we are saving the loggedInUser in the database using the **save** method of the 
 **mongoose** model.
+
+We can send the response back to user in __json__ format so that user can see his updated information instantly.
+```javascript
+    res.json({ message: `${loggedInUser.firstName}`, data: loggedInUser });
+```
+
+## Higher Order Functions :
+A function which takes another function as Argument or Returns a function from it is known as Higher Order function.
+for eg:
+```javascript
+function x(){
+  console.log("Hello")
+}
+
+function y(x){
+  x();
+}
+```
+So here function __Y__ is a Higher Order Function which takes __x__ as an Argument.So here X is known as callback function and y is a Higher 
+Order function
+
+## Creating a /sendConnectionRequest API.
+To create /sendConnectionRequest API wee have to first create a Schema to store these connections separately from __userSchema__ as 
+the connection Request that a user sends will have many cases like whether they will be accepted or rejected or they will be still in pending
+state.
+So for that in our models folder we will add a file to create our connection Request schema.
+
+To create our __connectionRequestSchema__ we will import mongoose and then we will call the Schema method on the mongoose model and then we will pass an Object inside it.
+```javascript
+const mongoose = require("mongoose")
+
+const connectionRequestSchema = new mongoose.schema({
+  fromUserId:{
+    type:mongoose.Scehma.Types.ObjectId
+  },
+  toUserId:{
+    type:mongoose.Schema.Types.ObjectId
+  },
+  status:{
+    type:String,
+    enum:["Ignore","Interested","Accepted","Rejected"]
+    message:`{VALUE} is In-Correct Status Type`
+  }
+})
+```
+Here in status we have used __enum__ which takes an Array creates a validator that checks if the value is strictly equal to one of the values in the given array.
+If value is not there we can pass a custome error message that the provided value does not exist in our Status.
+
+We can also add this enum validation in our userSchema on gender field or we can also use the validator function that we have passed there.
+
+After Creating the ConnectionRequest schema we will create a Model from that Schema.
+```javascript
+const ConnectionRequestModel = new mongoose.model("ConnectionRequest",connectionRequestSchema)
+
+module.exports = ConnectionRequestModel;
+```
+After creating the Model we have exported the model.
+Now we can create our connectionRequestApi and we can put some data into it.
+
+## Creating the sendConnectionRequestAPI :
+We will creating our sendConnectionRequestApi in request.js file as we have already had a sendConnectionRequest API in that so we can 
+modify and create the connection new sendConnectionRequest-API.
+```javascript
+requestRouter.post("/request/send/interested/:toUserId",async(req,res)=>{
+  try {
+    const fromUserId = req.user._id
+  }
+})
+```
+So here our fromUserId will be the userId of the Logged-In User and we are getting that from our userAuth middleware after we are verifying that
+user is Logged in and then we are attaching that user and callinf the next middleware function and after that we are extracting the user._id 
+in our sendConnection Request API.
+So the fromUserId will be the user Id of the loggedInUser and toUserId will come from 
+```javascript
+const toUserId = req.params.toUserId
+```
+and also our status will come from params
+```javascript
+const status = req.params.status
+```
+Now After fetching the fromUserId , toUserId and status we will pass it into user Model and then we will call save method on our User
+Model.
+```javascript
+requestRouter.post(
+  "/request/send/:status/:touserId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const fromUserId = req.user._id;
+      const toUserId = req.params.touserId;
+      const status = req.params.status;
+
+      const connectionRequest = new ConnectionRequest({
+        fromUserId,
+        toUserId,
+        status,
+      });
+
+      const data = await connectionRequest.save();
+      res.json({
+        message: "Connection Request Sent Successfully",
+        data,
+      });
+    } catch (err) {
+      res.status(400).send("ERROR : " + err.message);
+    }
+  }
+);
+```
+And Once we hit the above post API path with Correct User Details the above connection Request will be sent and save in our connectionRequestSchema as we have called __.save()__ method on our connction Request Schema.
