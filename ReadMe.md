@@ -2541,3 +2541,102 @@ requestRouter.post(
   }
 );
 ```
+## Creating the GET API to fetch all the Pending connections requests for Logged In User:
+
+```javascript
+userRouter.get("/user/requests/received", userAuth, async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+
+    const connectionRequests = await ConnectionRequestModel.find({
+      toUserId: loggedInUser._id,
+      status: "interested",
+    }).populate("fromUserId", ["firstName", "lastName"]);
+
+    res.json({
+      message: "Data Fetched Successfully",
+      data: connectionRequests,
+    });
+  } catch (err) {
+    res.status(400).send("ERROR :" + err.message);
+  }
+});
+```
+
+## Creating Relation between two Collections (Tables)
+To create a link between the 2 tables in MongoDB we use a __ref__ field and then we can pass the table Name which we want to Link.
+for eg:
+```javascript
+const connectionRequestSchema = new mongoose.Schema(
+  {
+    fromUserId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref:"User",
+      required: true,
+    },
+    toUserId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+    },
+    status: {
+      type: String,
+      required: true,
+      enum: {
+        values: ["ignored", "interested", "accepted", "rejected"],
+        message: `{VALUE} is incorrect Status Type`,
+      },
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+```
+So here In our __fromUserId__ field we have specified a __ref:__  referdence to our User collection and it creates link between the 2 tables internally and it will fecth the user which is there in User table with that __fromUserID__ 
+And after passing this __ref__ we can now use a __.populate()__ method on our connectionRequest Model and pass the data that we want from
+__fromuserId__ field.
+```javascript
+userRouter.get("/user/requests/received", userAuth, async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+
+    const connectionRequests = await ConnectionRequestModel.find({
+      toUserId: loggedInUser._id,
+      status: "interested",
+    }).populate("fromUserId", ["firstName", "lastName"]);
+
+    res.json({
+      message: "Data Fetched Successfully",
+      data: connectionRequests,
+    });
+  } catch (err) {
+    res.status(400).send("ERROR :" + err.message);
+  }
+});
+```
+So after passing the __ref__ on our connectionRequestSchema's fromUserId field we can use a __.popoluate__ method on our connection Request
+Model and mention the field names.
+.populate("fromUserId", ["firstName", "lastName"]) does the following:
+
+"fromUserId" is a reference (ObjectId) to another collection (User model).
+Instead of returning just the ObjectId, Mongoose replaces it with the actual user document.
+It only includes firstName and lastName from the User collection (excluding other fields).
+
+If we do not specify the field names to fetch for our "fromUserId" then it will fetch all the fields for that __fromUserId__ from __User__ colllection.
+So we should not allow OverFetching the data from Our API's and to do that we are limiting the number of fields that we are getting from the 
+User Collection.
+
+So to filter the fields we are explicitly specifying the field names as an Array that should be returned for that __fromUserId__:
+```javascript
+.populate("fromUserId", ["firstName", "lastName"]);
+```
+So For better performance and security: Always fetch only the fields you need instead of the entire document.
+Either we can pass an Array like above or we can pass strings as field names we want to fetch.
+for eg:
+```javascript
+.populate("fromUserId", "firstName lastName photoUrl ");
+```
+while passing the string we have to just separate them by a Space
+
+And then we are sending that data to client in JSON format so this is how we create a realtion betweeen two collections in Mongoose.
+[Read More about ref and populate][https://mongoosejs.com/docs/populate.html]
