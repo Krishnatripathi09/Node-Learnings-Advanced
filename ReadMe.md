@@ -2631,7 +2631,7 @@ So to filter the fields we are explicitly specifying the field names as an Array
 .populate("fromUserId", ["firstName", "lastName"]);
 ```
 So For better performance and security: Always fetch only the fields you need instead of the entire document.
-Either we can pass an Array like above or we can pass strings as field names we want to fetch.
+Either we can pass an Array like above or we can pass strings as field names which we want to fetch using __.populate()__
 for eg:
 ```javascript
 .populate("fromUserId", "firstName lastName photoUrl ");
@@ -2640,3 +2640,32 @@ while passing the string we have to just separate them by a Space
 
 And then we are sending that data to client in JSON format so this is how we create a realtion betweeen two collections in Mongoose.
 [Read More about ref and populate][https://mongoosejs.com/docs/populate.html]
+
+## Creating the get API to get all the connection Requests which a user has accepted 
+To get the connection Request that has been accepted by a user we will use a or method on our ConnectionRequestModel to find the userId of 
+logged in User as logged user could be toUserId or fromUserId and then we will fetch only the fields which are there in __USER_SAFE_DATA__ 
+Variable which we have created and then we are using map method to fetch the fields only from __fromUserId__
+
+```javascript
+
+const USER_SAFE_DATA = "firstName lastName photoUrl age gender about skills";
+
+userRouter.get("/user/connections", userAuth, async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+
+    const connectionRequest = await ConnectionRequestModel.find({
+      $or: [
+        { toUserId: loggedInUser._id, status: "accepted" },
+        { fromUserId: loggedInUser._id, status: "accepted" },
+      ],
+    }).populate("fromUserId", USER_SAFE_DATA);
+
+    const data = connectionRequest.map((row) => row.fromUserId);
+
+    res.json({ data });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+```
