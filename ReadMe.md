@@ -2481,3 +2481,63 @@ Result: Even with 1 million users, MongoDB finds the user almost instantly inste
 ✅ With an index, MongoDB searches the B-tree structure instead of scanning all documents.
 ✅ Queries on indexed fields are much faster and more efficient.
 ✅ Indexes are automatically updated when you insert, update, or delete documents.
+
+
+## Creating the API for Accepting or Rejecting the Connection Request :
+So here We are creating the API to accept or Reject the connection Request.
+so first we are gettting the info of the LoggedIn User which is coming from the userAuth.
+Then we are getting the status and requestId from our Route Params.
+Then we have set a allowed Status Type for this API which is Either the User can Accept or Reject the Connection Request.
+
+So If the status coming in route parameter is other than accepted or Rejected then we will throw the Error that this Status is not Allowed.
+
+But If it is a valid Status then we will check in our ConnectionRequest Model whether the request Id Exists in our __ConnectionRequest__
+Model or not if it exists then we are also checking whether the loggedInUser is toUser and also the Status is __interested__.
+If any of these details do not match then we will throw an Error that Connection Request Does not Exist.
+
+And If all the details match then we will change the status of in connectionRequest Model by setting __ConnectionRequest.status = status__
+connectionRequest.status to the Status coming from our Body.
+ And Then we are saving that in our DataBase by calling __.save()__ method on ConnectionRequest Model.
+ 
+ And then sending the Successful Message to Client.
+ 
+```javascript
+requestRouter.post(
+  "/request/review/:status/:requestId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const loggedInUser = req.user;
+      const { status, requestId } = req.params;
+
+      const allowedStatus = ["accepted", "rejected"];
+      if (!allowedStatus.includes(status)) {
+        return res.status(400).json({ message: "Status Not Allowed Babua 🤨" });
+      }
+
+      const connectionRequest = await ConnectionRequest.findOne({
+        _id: requestId,
+        toUserId: loggedInUser._id,
+        status: "interested",
+      });
+      if (!connectionRequest) {
+        return res
+          .status(404)
+          .json({ message: "Connection Naikhe Milal Re 😑" });
+      }
+
+      connectionRequest.status = status;
+
+      const data = await connectionRequest.save();
+
+      res.json({ message: "Connection Request Accepted SuccessFully", data });
+      //validate the status whether it is correct or Not.
+      //krishna ==> Elon (when krishna sent the request to Elon)
+      //Elon should be Logged In User
+      //Status should be Interested
+    } catch (err) {
+      res.status(400).send("ERROR :" + err.message);
+    }
+  }
+);
+```
