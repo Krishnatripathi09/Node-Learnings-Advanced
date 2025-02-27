@@ -52,4 +52,27 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
   }
 });
 
+userRouter.get("/feed", userAuth, async (req, res) => {
+  try {
+    //User should see all the user cards except
+    //0: his Own Card
+    //1: his connections
+    //2:ignored people
+    //3:already sent the connection Request.
+
+    const loggedInUser = req.user;
+
+    const connectionRequests = await ConnectionRequestModel.find({
+      $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+    })
+      .select("fromUserId toUserId")
+      .populate("fromUserId", "firstName")
+      .populate("toUserId", "firstName");
+
+    res.send(connectionRequests);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
 module.exports = userRouter;

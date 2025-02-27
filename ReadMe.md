@@ -2576,6 +2576,7 @@ const connectionRequestSchema = new mongoose.Schema(
     },
     toUserId: {
       type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
     status: {
@@ -2592,7 +2593,7 @@ const connectionRequestSchema = new mongoose.Schema(
   }
 );
 ```
-So here In our __fromUserId__ field we have specified a __ref:__  referdence to our User collection and it creates link between the 2 tables internally and it will fecth the user which is there in User table with that __fromUserID__ 
+So here In our __fromUserId__ and __toUserId__ field we have specified a __ref:__  reference to our User collection and it creates link between the 2 tables internally and it will fecth the user which is there in User table with that __fromUserID__ and __toUserId__.
 And after passing this __ref__ we can now use a __.populate()__ method on our connectionRequest Model and pass the data that we want from
 __fromuserId__ field.
 ```javascript
@@ -2622,7 +2623,7 @@ Model and mention the field names.
 Instead of returning just the ObjectId, Mongoose replaces it with the actual user document.
 It only includes firstName and lastName from the User collection (excluding other fields).
 
-If we do not specify the field names to fetch for our "fromUserId" then it will fetch all the fields for that __fromUserId__ from __User__ colllection.
+If we do not specify the field names to fetch for our "fromUserId" then it will fetch all the fields for that __fromUserId__ from __User__ collection.
 So we should not allow OverFetching the data from Our API's and to do that we are limiting the number of fields that we are getting from the 
 User Collection.
 
@@ -2669,3 +2670,9 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
   }
 });
 ```
+## Creating the feed API for Users:
+To create this API we have to make sure that :
+1) User should not see his own Card in his Feed
+2) User should not see the cards of users who have already accpeted the connection Request of the user or User has accepted their Connection Req.
+3) User should not see the cards of user whom he has ignored or already sent the connection Request to them.
+  
