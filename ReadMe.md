@@ -2740,3 +2740,65 @@ const user = await User.find({
 }).select(USER_SAFE_DATA)
 ```
 So here we are selecting only the fields which are there in USER_SAFE_DATA to prevent users from OverFetching the Data.
+[Read More About Comparison Parameter nin,ne][https://www.mongodb.com/docs/manual/reference/operator/query/nin/]
+
+## Adding Pagination in Our API.
+To create the Pagination We will use __.skip()__ and __.limit()__ functions in MongoDB.
+
+for Eg:
+If we do .skip(0) & .limit(10) then it show us first 10 users and skip 0 users.
+If we do .skip(10) & .limit(10) then it show us next 10 users and skip 10 users.
+
+
+so here we are getting our page from our __req.params__ and if it is not specified then we are setting as 1
+and for the limit as well we are keeping it 10 if not sepcified.
+
+And we have to calculate skip using a Formula
+like skip = (page-1)*limit;
+so here if we are on page 4 so it will do 4-1 which will be 3 and then multiply by 10 so it will be equal to 30.
+so it will skip 30 records
+```javascript
+userRouter.get("/feed", userAuth, async (req, res) => {
+  try {
+    //User should see all the user cards except
+    //0: his Own Card
+    //1: his connections
+    //2:ignored people
+    //3:already sent the connection Request.
+  const loggedInUser = req.user;
+
+
+    const page = parseInt(req.query.page) || 1;
+    let  limit = parseInt(req.query.limit) || 4;
+     limit =  limit >50 ? 50 : limit 
+     const skip = (page-1)*limit;
+
+
+  
+
+    const connectionRequests = await ConnectionRequestModel.find({
+      $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+    }).select("fromUserId toUserId");
+
+    const hideUsersFromFeed = new Set();
+    connectionRequests.forEach((req) => {
+      hideUsersFromFeed.add(req.fromUserId.toString());
+      hideUsersFromFeed.add(req.toUserId.toString());
+    });
+
+    const users = await User.find({
+      $and: [
+        { _id: { $nin: Array.from(hideUsersFromFeed) } },
+        { _id: { $ne: loggedInUser._id } },
+      ],
+    })
+      .select(USER_SAFE_DATA)
+      .skip(skip)
+      .limit(limit);
+
+    res.send(users);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+```
