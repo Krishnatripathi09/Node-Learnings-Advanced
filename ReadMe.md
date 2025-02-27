@@ -2675,4 +2675,68 @@ To create this API we have to make sure that :
 1) User should not see his own Card in his Feed
 2) User should not see the cards of users who have already accpeted the connection Request of the user or User has accepted their Connection Req.
 3) User should not see the cards of user whom he has ignored or already sent the connection Request to them.
-  
+
+```javascript
+userRouter.get("/feed", userAuth, async (req, res) => {
+  try {
+    //User should see all the user cards except
+    //0: his Own Card
+    //1: his connections
+    //2:ignored people
+    //3:already sent the connection Request.
+
+    const loggedInUser = req.user;
+
+    const connectionRequests = await ConnectionRequestModel.find({
+      $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+    })
+      .select("fromUserId toUserId")
+      .populate("fromUserId", "firstName")
+      .populate("toUserId", "firstName");
+
+    res.send(connectionRequests);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+```
+So here we have created a get API to fetch all the the users to whom we have sent the connection Request.
+ But we will have to find the unique users with above conditions as true.
+ So for that we  will create a data-structure which is set.
+ ```javascript
+ const hideUsersFromFeed = new set();
+ connectionRequests.forEach((req)=>{
+  hideUsersFromFeed.add(req.fromUserId);
+  hideUsersFromFeed.add(req.toUserId);
+ })
+console.log(hideUsersFromFeed)
+ ```
+ So using the set data structure we are hiding the user details to whom we have sent the request or received the request if we are 
+connection with them.
+
+So now we will find the users from our dataBase whose id's are not present in our __hideUsersFromFeed__ set.
+```javascript
+const user = await User.find({
+_id:{$nin:Array.from(hideUsersFromFeed)}
+})
+```
+nin- Not In
+And we also need to write a and Query to hide our Card as well.
+```javascript
+const user = await User.find({
+  $and:[{_id:{nin:Array.from(hideUsersFromFeed)}},
+    {_id:{$ne:loggedInUser._id}},
+  ]
+})
+```
+and we will only Select the fields which we have in our __USER_SAFE_DATA__ so for that we will do a select Query on our __User__ Model
+```javascript
+const USER_SAFE_DATA = "firstName lastName photoUrl age gender about skills";
+
+const user = await User.find({
+  $and:[{_id:{nin:Array.from(hideUsersFromFeed)}},
+    {_id:{$ne:loggedInUser._id}},
+  ]
+}).select(USER_SAFE_DATA)
+```
+So here we are selecting only the fields which are there in USER_SAFE_DATA to prevent users from OverFetching the Data.

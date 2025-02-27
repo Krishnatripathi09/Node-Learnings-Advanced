@@ -2,6 +2,7 @@ const express = require("express");
 const userRouter = express.Router();
 const { userAuth } = require("../middlewares/auth");
 const ConnectionRequestModel = require("../models/connectionRequest");
+const User = require("../models/user");
 //Get all the Pending Connection requests for Logged-In User
 
 const USER_SAFE_DATA = "firstName lastName photoUrl age gender about skills";
@@ -64,12 +65,22 @@ userRouter.get("/feed", userAuth, async (req, res) => {
 
     const connectionRequests = await ConnectionRequestModel.find({
       $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
-    })
-      .select("fromUserId toUserId")
-      .populate("fromUserId", "firstName")
-      .populate("toUserId", "firstName");
+    }).select("fromUserId toUserId");
 
-    res.send(connectionRequests);
+    const hideUsersFromFeed = new Set();
+    connectionRequests.forEach((req) => {
+      hideUsersFromFeed.add(req.fromUserId.toString());
+      hideUsersFromFeed.add(req.toUserId.toString());
+    });
+
+    const users = await User.find({
+      $and: [
+        { _id: { $nin: Array.from(hideUsersFromFeed) } },
+        { _id: { $ne: loggedInUser._id } },
+      ],
+    }).select(USER_SAFE_DATA);
+
+    res.send(users);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
