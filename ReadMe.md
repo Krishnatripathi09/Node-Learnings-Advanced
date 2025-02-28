@@ -1015,20 +1015,20 @@ for eg:
 
 app.post("/signup", async (req, res) => {
   console.log(req);
-  //  const userObj = {
-  //   firstName: "Krishna",
-  //   lastName: "Tripathi",
-  //   email: "krishna@gmail.com",
-  //   password: "krishna123",
-  // };
+   const userObj = {
+    firstName: "Krishna",
+    lastName: "Tripathi",
+    email: "krishna@gmail.com",
+    password: "krishna123",
+  };
 
-    // const user = new User(userObj);
-    // try {
-    //   await user.save();
-    //   res.send("Data Saved SucessFully");
-    // } catch (err) {
-    //   res.status(400).send("Error Sending the data:" + err.message);
-    // }
+    const user = new User(userObj);
+    try {
+      await user.save();
+      res.send("Data Saved SucessFully");
+    } catch (err) {
+      res.status(400).send("Error Sending the data:" + err.message);
+    }
 });
 ```
 Here req Body does not contain only data but other things as well so the incoming message is very big which we can see in our 
@@ -2757,6 +2757,7 @@ And we have to calculate skip using a Formula
 like skip = (page-1)*limit;
 so here if we are on page 4 so it will do 4-1 which will be 3 and then multiply by 10 so it will be equal to 30.
 so it will skip 30 records
+And then we have passed our skip and Limit into skip and limit functions of Mongoose.
 ```javascript
 userRouter.get("/feed", userAuth, async (req, res) => {
   try {
