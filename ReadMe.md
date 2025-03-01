@@ -1013,23 +1013,23 @@ Now when we send the data from our POST API in request body,then we have to read
 ```javascript
 for eg:
 
-app.post("/signup", async (req, res) => {
-  console.log(req);
-   const userObj = {
-    firstName: "Krishna",
-    lastName: "Tripathi",
-    email: "krishna@gmail.com",
-    password: "krishna123",
-  };
+// app.post("/signup", async (req, res) => {
+//   console.log(req);
+//    const userObj = {
+//     firstName: "Krishna",
+//     lastName: "Tripathi",
+//     email: "krishna@gmail.com",
+//     password: "krishna123",
+//   };
 
-    const user = new User(userObj);
-    try {
-      await user.save();
-      res.send("Data Saved SucessFully");
-    } catch (err) {
-      res.status(400).send("Error Sending the data:" + err.message);
-    }
-});
+//     const user = new User(userObj);
+//     try {
+//       await user.save();
+//       res.send("Data Saved SucessFully");
+//     } catch (err) {
+//       res.status(400).send("Error Sending the data:" + err.message);
+//     }
+// });
 ```
 Here req Body does not contain only data but other things as well so the incoming message is very big which we can see in our 
 console as we have logged our _req_ Object in console.
