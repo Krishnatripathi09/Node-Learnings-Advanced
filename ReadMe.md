@@ -1099,7 +1099,7 @@ Read it more : __https://mongoosejs.com/docs/api/model.html#Model.findById()__
 app.get("/user", async (req, res) => {
   const email = req.body.email;
   const user = await User.find({ email: email });
-  // console.log(user);
+  console.log(user);
   res.send(user);
 });
 ```
@@ -1135,7 +1135,7 @@ app.get("/user", async (req, res) => {
   } catch (err) {
     res.status(400).send("Something Went Wrong.");
   }
-  // console.log(user);
+  console.log(user);
 });
 ```
 when a user is not found in DB then we are sending that user with this email is Not Found:
@@ -1156,7 +1156,7 @@ app.get("/user", async (req, res) => {
   } catch (err) {
     res.status(400).send("Something Went Wrong.");
   }
-  // console.log(user);
+  console.log(user);
 });
 ```
 If we do not specify any condition inside __findOne({})__ method then it will return any random document from the database (usually the firstOne) . 
