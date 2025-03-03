@@ -300,6 +300,15 @@ To solve this issue we can install nodemon(It is a utility file which monitors o
 using _npm install -g nodemon_ and then restart our server using command _nodemon filename.js_ instead of _npm src/app.js_.
 And nodemon will watch our app for any changes and will start it automatically when anything changes.
 
+**What is Nodemon?**
+Nodemon is a Node.js package that automatically restarts the server whenever file changes are detected, so you don’t need to manually restart the server after every change.
+
+**How Does Nodemon Work?**
+It watches your project files (JavaScript, TypeScript, JSON, etc.).
+When a change is detected, it automatically restarts the server to reflect the updates.
+It improves developer efficiency by eliminating the need for manual restarts.
+
+
 When we install a Package globally it gets installed at _C:\Users\<YourUsername>\AppData\Roaming\npm\node_modules_
 
 Instead of writing _nodemon src/app.js_ everytime we want to start our server using Nodemon we can specify a script like below in our 
@@ -312,6 +321,31 @@ And then when we want to start our server in watch mode for any changes then we 
 and it will actually use the above command to start our app using _Nodemon_.
 Or We can also Run our app using _npm run Start_ and then it will start our app in normal mode and behind the scenes like above in which we have 
 to manually start our server after any changes. 
+
+
+## 🔹 What is a Module in Node.js?
+A module is a reusable block of code encapsulated in a separate file.
+
+It helps keep the code organized and modular.
+Node.js automatically wraps each module in an IIFE (Immediately Invoked Function Expression) to provide module scope.
+
+When we require() a module, Node.js automatically wraps it in a function like this 👇
+```javascript
+(function(exports, require, module, __filename, __dirname) {
+  function add(a, b) {
+    return a + b;
+  }
+
+  function subtract(a, b) {
+    return a - b;
+  }
+
+  module.exports = { add, subtract };
+})();
+
+```
+This ensures each module has its own scope (variables inside don’t pollute the global scope).
+
 
 ## Deleting the Node_Modules and package-lock.json
 We can delete our package-lock.json and node_modules folder and still that can be Recreated by Running _npm install_ in our Project as our 
@@ -418,6 +452,14 @@ We can also use regex in our api path to make it more dynamic for eg: if we have
 a path __/a/__ so here if i go to path /a it will work and if we go to path __/b/__ it will not work.
 We can also use the other REGEX in our path like __/a[0-9]__ then it will work for path __/a1/__ and __/a2/__ but it will not work
 for path __/a/__ and __/b/__ as we have used regex in our path to accept numbers in our path after (a).
+
+The regex /.*fly$/ in a route path is used to match any route that ends with "fly", regardless of what comes before it.
+
+- Breaking Down /.*fly$/
+/	Start of the regex pattern
+.*	Matches any character (.) repeated zero or more times (*)
+fly	The string "fly" must be present at the end
+$	End of the string (ensures "fly" is at the end)
 
 ## Query Params :
 Query Parameters are key-value pairs sent in the URL after a (?) question mark  and are use to filter or modify the request.
