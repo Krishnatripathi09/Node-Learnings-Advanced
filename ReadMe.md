@@ -1275,7 +1275,7 @@ const userSchema = new mongoose.Schema({
   lastName: {
     type: String,
   },
-  email: {
+  email: 
     type: String,
     required: true,
     unique: true,
@@ -1564,7 +1564,9 @@ app.patch("/user/:userId", async (req, res) => {
 });
 ```
 
-Now to validate our email-Id we can use a liabrary as validating email is not a easy job.
+Now to validate our email-Id we can use a library as validating email is not a easy job.
+
+## Using Validator Function :
 So to Validate our email we can use __validator__ package from __npm__ and it becomes very easy to validate email with that library.
 ```javascript
 email: {
